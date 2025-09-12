@@ -39,6 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+
+    # rest auth
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+
     'rest_framework',
     'rest_framework.authtoken',
     'drf_yasg',
@@ -130,3 +139,31 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Required for allauth
+SITE_ID = 1
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+    ),
+}
+
+# REST_USE_JWT = True
+# JWT_AUTH_COOKIE = 'polls-auth'
+# JWT_AUTH_REFRESH_COOKIE = 'polls-refresh-token'
+
+# Allauth settings
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_USERNAME_REQUIRED = False
+
+# Email backend for development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# For production:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
