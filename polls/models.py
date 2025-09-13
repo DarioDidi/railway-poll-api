@@ -1,3 +1,5 @@
+
+# polls/models.py
 import uuid
 from django.db import models
 from django.utils import timezone
@@ -7,7 +9,8 @@ from users.models import User
 
 class Poll(models.Model):
     """
-    Represents a poll/survey with multiple options and voting constraints.
+    Represents a poll/survey with multiple options.
+    Always has an owner, but creator may be null for anonymous polls.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     question = models.TextField(max_length=500)
@@ -15,30 +18,42 @@ class Poll(models.Model):
     is_anonymous = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    creator = models.ForeignKey(
+
+    # Always has an owner (for accountability and management)
+    owner = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
+        related_name='owned_polls'
+    )
+
+    # Creator may be null for anonymous polls (not shown in API responses)
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name='created_polls'
+    )
+
+    start_date = models.DateTimeField(
+        default=timezone.now,
+        validators=[MinValueValidator(timezone.now())]
     )
     expiry_date = models.DateTimeField(
         validators=[MinValueValidator(
             timezone.now() + timezone.timedelta(hours=1))]
     )
-    start_date = models.DateTimeField(
-        default=timezone.now,
-        validators=[MinValueValidator(timezone.now())]
-    )
     is_active = models.BooleanField(default=True)
 
     class Meta:
         indexes = [
-            models.Index(fields=['creator', 'created_at']),
+            models.Index(fields=['owner', 'created_at']),
             models.Index(fields=['expiry_date', 'is_active']),
         ]
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.question[:50]}... by {self.creator.email}"
+        return f"{self.question[:50]}... by {self.owner.email}"
 
     @property
     def has_started(self):
@@ -77,7 +92,7 @@ class Poll(models.Model):
 class Vote(models.Model):
     """
     Records a user's vote on a specific poll option.
-    Implements unique constraint to prevent duplicate voting.
+    Always tied to an authenticated user.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     poll = models.ForeignKey(
@@ -87,37 +102,28 @@ class Vote(models.Model):
     )
     user = models.ForeignKey(
         User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
+        on_delete=models.CASCADE,
+        related_name='votes'
     )
     option_index = models.IntegerField(
         validators=[MinValueValidator(0)]
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
                 fields=['poll', 'user'],
-                name='unique_user_vote',
-                condition=models.Q(user__isnull=False)
-            ),
-            models.UniqueConstraint(
-                fields=['poll', 'ip_address'],
-                name='unique_ip_vote',
-                condition=models.Q(user__isnull=True, ip_address__isnull=False)
+                name='unique_user_vote_per_poll'
             )
         ]
         indexes = [
             models.Index(fields=['poll', 'user']),
-            models.Index(fields=['poll', 'ip_address']),
+            models.Index(fields=['user', 'created_at']),
         ]
 
     def __str__(self):
-        voter = self.user.email if self.user else self.ip_address
-        return f"Vote by {voter} on {self.poll.question[:30]}..."
+        return f"Vote by {self.user.email} on {self.poll.question[:30]}..."
 
 
 class BlockedIP(models.Model):
