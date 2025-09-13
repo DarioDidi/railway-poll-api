@@ -53,13 +53,18 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'django_filters',
+    'rest_framework_simplejwt',
 
     # custom apps
-    'users'
+    'users',
+    'polls'
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+    'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
