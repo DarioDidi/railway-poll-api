@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import warnings
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -175,3 +176,9 @@ ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # For production:
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# suppress the warnings temporarily:
+warnings.filterwarnings(
+    "ignore", message="app_settings.USERNAME_REQUIRED is deprecated")
+warnings.filterwarnings(
+    "ignore", message="app_settings.EMAIL_REQUIRED is deprecated")
