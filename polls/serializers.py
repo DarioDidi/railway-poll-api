@@ -82,9 +82,10 @@ class VoteSerializer(serializers.ModelSerializer):
                 "This poll is not currently active.")
 
         # Check for existing vote
-        user = self.request.user if self.request.user.is_authenticated else None
-        ip_address = self.request.META.get(
-            'REMOTE_ADDR') if self.request else None
+        user = self.request.user if self.request.user.is_authenticated \
+            else None
+        # ip_address = self.request.META.get(
+        #    'REMOTE_ADDR') if self.request else None
 
         existing_vote = Vote.objects.filter(
             poll=self.poll,

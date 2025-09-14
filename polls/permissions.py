@@ -1,7 +1,7 @@
 # polls/permissions.py
 from rest_framework import permissions
 from rest_framework.exceptions import PermissionDenied
-from django.utils import timezone
+# from django.utils import timezone
 
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
