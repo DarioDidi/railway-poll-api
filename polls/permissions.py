@@ -69,3 +69,38 @@ class CanEditPoll(permissions.BasePermission):
             )
 
         return True
+
+
+class CanDeletePoll(permissions.BasePermission):
+    """
+    Permission to check if a poll can be deleted.
+    Only allows deletion by owner and prevents deletion of polls with votes.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Only owner can delete
+        if obj.owner != request.user:
+            return False
+
+        # Check if poll has votes
+        if obj.votes.exists():
+            raise PermissionDenied(
+                detail="Cannot delete a poll that has votes.",
+                code='poll_has_votes'
+            )
+
+        return True
+
+
+class CanViewOwnVotes(permissions.BasePermission):
+    """
+    Permission that allows users to only view their own votes.
+    """
+
+    def has_permission(self, request, view):
+        # This endpoint is only for authenticated users to view their own votes
+        return request.user and request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        # Users can only view their own votes
+        return obj.user == request.user
