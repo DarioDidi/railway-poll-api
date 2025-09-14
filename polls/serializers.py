@@ -117,3 +117,24 @@ class PollResultsSerializer(serializers.Serializer):
     results = serializers.ListField(
         child=serializers.DictField(child=serializers.CharField())
     )
+
+
+class UserVoteSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user's own votes
+    """
+    poll_question = serializers.CharField(
+        source='poll.question', read_only=True)
+    poll_id = serializers.UUIDField(source='poll.id', read_only=True)
+    selected_option = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Vote
+        fields = ['id', 'poll_id', 'poll_question',
+                  'selected_option', 'created_at']
+
+    def get_selected_option(self, obj):
+        """Get the actual option text that was voted for"""
+        if obj.option_index < len(obj.poll.options):
+            return obj.poll.options[obj.option_index]
+        return "Unknown option"
