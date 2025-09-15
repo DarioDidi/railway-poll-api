@@ -1,9 +1,11 @@
 
 # Create your views here.
 from rest_framework import viewsets, status, mixins
+from rest_framework import filters as rest_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Poll, Vote
@@ -30,7 +32,11 @@ class PollViewSet(viewsets.ModelViewSet):
     ViewSet for managing polls with comprehensive permission controls.
     """
     queryset = Poll.objects.all()
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [
+        DjangoFilterBackend,
+        rest_filters.SearchFilter,
+        rest_filters.OrderingFilter
+    ]
     filterset_class = PollFilter
     search_fields = ['question', 'owner__email']
     ordering_fields = ['created_at', 'updated_at', 'start_date', 'expiry_date']
