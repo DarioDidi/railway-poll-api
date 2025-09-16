@@ -38,7 +38,7 @@ def user2():
 
 @pytest.fixture
 def authenticated_client(user):
-    """Authenticated client"""
+    """Authenticated API client"""
     client = APIClient()
     client.force_authenticate(user=user)
     return client
@@ -66,6 +66,20 @@ def poll(user):
 
 
 @pytest.fixture
+def anonymous_poll(user):
+    """Create an anonymous test poll owned by user"""
+    return Poll.objects.create(
+        question="Anonymous Poll Question?",
+        options=["Yes", "No"],
+        is_anonymous=True,
+        owner=user,
+        creator=None,  # Anonymous poll
+        start_date=timezone.now(),
+        expiry_date=timezone.now() + timezone.timedelta(days=1)
+    )
+
+
+@pytest.fixture
 def expired_poll(user):
     """Create an expired test poll"""
     return Poll.objects.create(
@@ -86,8 +100,8 @@ def future_poll(user):
         options=["Option X", "Option Y"],
         owner=user,
         creator=user,
-        start_date=timezone.now() + timezone.timedelta(hours=1),
-        expiry_date=timezone.now() + timezone.timedelta(days=1)
+        start_date=timezone.now() + timezone.timedelta(days=1),
+        expiry_date=timezone.now() + timezone.timedelta(days=3)
     )
 
 

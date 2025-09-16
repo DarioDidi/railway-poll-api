@@ -75,18 +75,22 @@ class PollViewSet(viewsets.ModelViewSet):
         """
         Cast a vote on a specific poll (authenticated users only).
         """
+        print("\n\n\nVOTINNG\n\n")
         poll = self.get_object()
+        print("on poll", poll)
         serializer = VoteSerializer(
             data=request.data,
             context={'poll': poll, 'request': request}
         )
 
         if serializer.is_valid():
+            print("Serializer  VALID")
             serializer.save()
             return Response(
                 {'message': 'Vote recorded successfully'},
                 status=status.HTTP_201_CREATED
             )
+        print("Serializer NOT VALID")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'])

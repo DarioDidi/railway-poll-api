@@ -62,16 +62,16 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+
     'django.middleware.security.SecurityMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'allauth.account.auth_backends.AuthenticationBackend',
-    'django.contrib.auth.backends.ModelBackend',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'poll_site.urls'
@@ -86,6 +86,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+
+                # `allauth` needs this from django
+                'django.template.context_processors.request',
             ],
         },
     },
@@ -171,7 +174,18 @@ ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 # ACCOUNT_USERNAME_REQUIRED = False
 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+# ACCOUNT_SIGNUP_FIELDS['username']['required'] = False
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by email
+    'allauth.account.auth_backends.AuthenticationBackend',
+
+]
 
 # Email backend for development
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

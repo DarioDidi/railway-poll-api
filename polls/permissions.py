@@ -63,6 +63,7 @@ class CanEditPoll(permissions.BasePermission):
 
         # Check if poll has already started
         if obj.has_started:
+            print(f"poll:{obj} has started")
             raise PermissionDenied(
                 detail="Cannot edit poll after it has started accepting votes",
                 code='poll_started'

@@ -7,6 +7,14 @@ from django.core.validators import MinValueValidator
 from users.models import User
 
 
+def one_hour_from_now():
+    return timezone.now() + timezone.timedelta(hours=1)
+
+
+def current_time():
+    return timezone.now()
+
+
 class Poll(models.Model):
     """
     Represents a poll/survey with multiple options.
@@ -36,12 +44,12 @@ class Poll(models.Model):
     )
 
     start_date = models.DateTimeField(
-        default=timezone.now,
-        validators=[MinValueValidator(timezone.now())]
+        auto_now_add=True,
+        validators=[MinValueValidator(current_time)]
     )
     expiry_date = models.DateTimeField(
         validators=[MinValueValidator(
-            timezone.now() + timezone.timedelta(hours=1))]
+            one_hour_from_now)]
     )
     is_active = models.BooleanField(default=True)
 
@@ -53,7 +61,8 @@ class Poll(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"{self.question[:50]}... by {self.owner.email}"
+        return (f"{self.question[:50]}... by {self.owner.email},"
+                f"started: {self.start_date}")
 
     @property
     def has_started(self):

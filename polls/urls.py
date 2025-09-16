@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import PollViewSet, VoteViewSet
 
-router = DefaultRouter()
+router = DefaultRouter(trailing_slash=True)
 router.register(r'polls', PollViewSet)
 router.register(r'my-votes', VoteViewSet, basename='myvote')
 
