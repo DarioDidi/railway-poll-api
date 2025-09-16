@@ -1,6 +1,6 @@
 import pytest
 from django.utils import timezone
-from polls.models import Poll
+from polls.models import Poll, Vote, BlockedIP
 from users.models import User
 
 
@@ -76,3 +76,41 @@ class TestPollModel:
         assert active_poll.can_vote() is True
         assert expired_poll.can_vote() is False
         assert future_poll.can_vote() is False
+
+
+@pytest.mark.django_db
+class TestVoteModel:
+    """Test cases for Vote model"""
+
+    def test_create_vote(self, poll, user):
+        vote = Vote.objects.create(poll=poll, user=user, option_index=0)
+
+        assert vote.poll == poll
+        assert vote.user == user
+        assert vote.option_index == 0
+
+    def test_unique_vote_constraint(self, poll, user):
+        """Test that a user can only vote once per poll"""
+        Vote.objects.create(poll=poll, user=user, option_index=0)
+
+        # Attempting to create another vote should raise
+        # IntegrityError or ValidationError
+        with pytest.raises(Exception):
+            Vote.objects.create(poll=poll, user=user, option_index=1)
+
+
+@pytest.mark.django_db
+class TestBlockedIPModel:
+    """Test cases for BlockedIP model"""
+
+    def test_create_blocked_ip(self):
+        """Test creating a blocked IP entry"""
+        blocked_ip = BlockedIP.objects.create(
+            ip_address="192.168.1.100",
+            reason="Test blocking",
+            is_active=True
+        )
+
+        assert blocked_ip.ip_address == "192.168.1.100"
+        assert blocked_ip.reason == "Test blocking"
+        assert blocked_ip.is_active is True
