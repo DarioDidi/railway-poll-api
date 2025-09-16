@@ -20,8 +20,8 @@ def user():
     return User.objects.create_user(
         email='test@example.com',
         password='testpass123',
-        first_name='Test',
-        last_name='User'
+        # first_name='Test',
+        # last_name='User'
     )
 
 
