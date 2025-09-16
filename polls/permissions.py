@@ -83,11 +83,11 @@ class CanDeletePoll(permissions.BasePermission):
             return False
 
         # Check if poll has votes
-        if obj.votes.exists():
-            raise PermissionDenied(
-                detail="Cannot delete a poll that has votes.",
-                code='poll_has_votes'
-            )
+        # if obj.votes.exists():
+        #    raise PermissionDenied(
+        #        detail="Cannot delete a poll that has votes.",
+        #        code='poll_has_votes'
+        #    )
 
         return True
 

@@ -26,6 +26,17 @@ def user():
 
 
 @pytest.fixture
+def user2():
+    """Create a second test user"""
+    return User.objects.create_user(
+        email='test2@example.com',
+        password='testpass123',
+        # first_name='Test2',
+        # last_name='User2'
+    )
+
+
+@pytest.fixture
 def authenticated_client(user):
     """Authenticated client"""
     client = APIClient()
