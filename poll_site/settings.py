@@ -160,40 +160,67 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ),
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ],
+    'DEFAULT_PAGINATION_CLASS': ('rest_framework.'
+                                 'pagination.PageNumberPagination'),
+    'PAGE_SIZE': 20,
 }
-
-# REST_USE_JWT = True
-# JWT_AUTH_COOKIE = 'polls-auth'
-# JWT_AUTH_REFRESH_COOKIE = 'polls-refresh-token'
-
-# Allauth settings
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_LOGIN_METHODS = {'email'}
-# ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-# ACCOUNT_USERNAME_REQUIRED = False
-
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
-# ACCOUNT_SIGNUP_FIELDS['username']['required'] = False
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-
 
 AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
-
     # `allauth` specific authentication methods, such as login by email
     'allauth.account.auth_backends.AuthenticationBackend',
-
 ]
 
-# Email backend for development
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# For production:
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# JWT settings
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = 'polls-auth'
+JWT_AUTH_REFRESH_COOKIE = 'polls-refresh-token'
 
-# suppress the warnings temporarily:
-warnings.filterwarnings(
-    "ignore", message="app_settings.USERNAME_REQUIRED is deprecated")
-warnings.filterwarnings(
-    "ignore", message="app_settings.EMAIL_REQUIRED is deprecated")
+# Django Allauth Settings
+# ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# ACCOUNT_EMAIL_REQUIRED = True
+# ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_LOGIN_METHODS = ["email"]
+
+# For newer allauth versions (comment out if using the old format below)
+# ACCOUNT_SIGNUP_FIELDS = {
+#    'email': {'required': True, 'label': 'Email'},
+#    'password1': {'required': True, 'label': 'Password'},
+#    'password2': {'required': True, 'label': 'Password (again)'},
+# }
+
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+# For older allauth versions (comment out if using the new format above)
+# ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+# Email backend for development
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+# Dj-rest-auth settings
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'polls-auth',
+    'JWT_AUTH_REFRESH_COOKIE': 'polls-refresh-token',
+    # 'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+}
+
+# To completely suppress the warnings
+warnings.filterwarnings("ignore",
+                        message="app_settings.USERNAME_REQUIRED is deprecated")
+warnings.filterwarnings("ignore",
+                        message="app_settings.EMAIL_REQUIRED is deprecated")

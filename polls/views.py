@@ -118,6 +118,18 @@ class PollViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(page, many=True)
         return self.get_paginated_response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def my_polls(self, request):
+        """
+        Get all active polls (current time between start and expiry dates).
+        """
+        user_polls = Poll.objects.filter(
+            owner=self.request.user
+        )
+        page = self.paginate_queryset(user_polls)
+        serializer = self.get_serializer(page, many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 class VoteViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,

@@ -11,6 +11,10 @@ def one_hour_from_now():
     return timezone.now() + timezone.timedelta(hours=1)
 
 
+def one_week_from_now():
+    return timezone.now() + timezone.timedelta(days=7)
+
+
 def current_time():
     return timezone.now()
 
@@ -44,10 +48,12 @@ class Poll(models.Model):
     )
 
     start_date = models.DateTimeField(
-        auto_now_add=True,
+        # auto_now_add=True,
+        default=current_time,
         validators=[MinValueValidator(current_time)]
     )
     expiry_date = models.DateTimeField(
+        default=one_week_from_now,
         validators=[MinValueValidator(
             one_hour_from_now)]
     )

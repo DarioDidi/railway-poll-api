@@ -3,7 +3,7 @@ from django.utils import timezone
 import json
 from rest_framework import status
 from django.urls import reverse
-from polls.models import Poll, Vote
+from polls.models import Vote  # ,Poll
 
 
 @pytest.mark.django_db
@@ -109,9 +109,11 @@ class TestPollAPI:
         assert 'results' in response.data
         assert len(response.data['results']) == len(poll_with_votes.options)
 
-    def test_my_polls_endpoint(self, authenticated_client, user, poll, anonymous_poll):
+    def test_my_polls_endpoint(self, authenticated_client,
+                               user, poll, anonymous_poll):
         """Test that users can see all polls they own"""
         my_polls_url = reverse('poll-my-polls')
+        print(f"USER POLLS URLS:{my_polls_url}")
 
         response = authenticated_client.get(my_polls_url)
         assert response.status_code == status.HTTP_200_OK
@@ -121,6 +123,7 @@ class TestPollAPI:
         """Test editing a poll before it starts"""
         url = reverse('poll-detail', kwargs={'pk': future_poll.id})
         data = {'question': 'Updated Question'}
+        print(f"editing future poll:{future_poll}")
 
         response = authenticated_client.patch(url, data, format='json')
         print(response.data)

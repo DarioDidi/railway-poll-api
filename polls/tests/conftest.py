@@ -95,13 +95,15 @@ def expired_poll(user):
 @pytest.fixture
 def future_poll(user):
     """Create a poll that hasn't started yet"""
+    start_date = timezone.now() + timezone.timedelta(days=1)
+    expiry_date = timezone.now() + timezone.timedelta(days=3)
     return Poll.objects.create(
         question="Future Poll Question?",
         options=["Option X", "Option Y"],
         owner=user,
         creator=user,
-        start_date=timezone.now() + timezone.timedelta(days=1),
-        expiry_date=timezone.now() + timezone.timedelta(days=3)
+        start_date=start_date,
+        expiry_date=expiry_date
     )
 
 
