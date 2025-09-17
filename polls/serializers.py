@@ -3,6 +3,8 @@ from rest_framework import serializers
 from django.utils import timezone
 from .models import Poll, Vote
 
+from polls.models import current_time
+
 
 class PollCreateSerializer(serializers.ModelSerializer):
     """
@@ -20,8 +22,10 @@ class PollCreateSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        start_date = data.get('start_date', timezone.now())
-        expiry_date = data.get('expiry_date')
+        def_start = current_time()
+        def_end = def_start + timezone.timedelta(days=7)
+        start_date = data.get('start_date', def_start)
+        expiry_date = data.get('expiry_date', def_end)
 
         if expiry_date <= start_date:
             raise serializers.ValidationError(

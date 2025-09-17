@@ -1,4 +1,4 @@
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "poll_site.settings"
 # -- recommended but optional:
-python_files = ["polls/tests/*.py",]
+python_files = ["polls/tests/*.py","**/tests/*.py"]

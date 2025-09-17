@@ -55,7 +55,10 @@ class Poll(models.Model):
     expiry_date = models.DateTimeField(
         default=one_week_from_now,
         validators=[MinValueValidator(
-            one_hour_from_now)]
+            one_hour_from_now)],
+        null=False,
+        blank=False
+
     )
     is_active = models.BooleanField(default=True)
 
