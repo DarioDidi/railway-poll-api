@@ -5,6 +5,7 @@ from rest_framework import filters as rest_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.core.exceptions import ValidationError
 
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
@@ -22,7 +23,8 @@ from .permissions import (
     CanEditPoll,
     CanDeletePoll,
     # IsAuthenticatedForWriteOperations,
-    CanViewOwnVotes
+    CanViewOwnVotes,
+    VotesAreReadOnly
 )
 from .filters import PollFilter
 
@@ -131,26 +133,50 @@ class PollViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
 
+# class VoteViewSet(mixins.ListModelMixin,
+        # mixins.RetrieveModelMixin,
+        # viewsets.GenericViewSet):
+
+
 class VoteViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
-
     """
-    ViewSet for users to manage their own votes.
-    Users can view and delete their votes, but not create/update.
-    Voting isdone via Poll vote action
+    ViewSet for users to view their own votes.
+    Votes are permanent and cannot be modified or deleted.
+    Votes are created through poll vote endpoint
     """
     serializer_class = UserVoteSerializer
-    permission_classes = [IsAuthenticated, CanViewOwnVotes]
-    http_method_names = [
-        m for m in viewsets.ModelViewSet.http_method_names
-        if m not in ['delete']
-    ]
+    # permission_classes = [IsAuthenticated, CanViewOwnVotes, VotesAreReadOnly]
+
+    # REORDER: Method-level permission first, then object-level
+    permission_classes = [IsAuthenticated, VotesAreReadOnly, CanViewOwnVotes]
 
     def get_queryset(self):
         """Users can only see their own votes"""
         return Vote.objects.filter(user=self.request.user)
 
-    def destroy(self, request, pk=None):
-        response = {'message': 'Delete function is not offered in this path.'}
-        return Response(response, status=status.HTTP_403_FORBIDDEN)
+    @action(detail=False, methods=['get'])
+    def by_poll(self, request):
+        """
+        Get all votes by the current user for a specific poll.
+        """
+        poll_id = request.query_params.get('poll_id')
+        if not poll_id:
+            return Response(
+                {'error': 'poll_id parameter is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            votes = Vote.objects.filter(
+                user=request.user,
+                poll_id=poll_id
+            )
+            serializer = self.get_serializer(votes, many=True)
+            return Response(serializer.data)
+        except (ValueError, ValidationError):
+            return Response(
+                {'error': 'Invalid poll_id format'},
+                status=status.HTTP_400_BAD_REQUEST
+            )

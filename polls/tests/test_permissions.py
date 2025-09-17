@@ -2,7 +2,7 @@
 import pytest
 from rest_framework.test import APIRequestFactory
 from django.contrib.auth import get_user_model
-from polls.models import Poll, Vote
+from polls.models import Vote
 from polls.permissions import (
     IsOwnerOrReadOnly, CanVote, CanEditPoll,
     CanDeletePoll, CanViewOwnVotes

@@ -136,9 +136,20 @@ class Vote(models.Model):
             models.Index(fields=['poll', 'user']),
             models.Index(fields=['user', 'created_at']),
         ]
+        ordering = ['-created_at']
 
     def __str__(self):
         return f"Vote by {self.user.email} on {self.poll.question[:30]}..."
+
+    def save(self, *args, **kwargs):
+        """Prevent updating existing votes"""
+        if self.pk and Vote.objects.filter(pk=self.pk).exists():
+            raise PermissionError("Votes cannot be modified once created.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        """Prevent deleting votes"""
+        raise PermissionError("Votes cannot be deleted.")
 
 
 class BlockedIP(models.Model):

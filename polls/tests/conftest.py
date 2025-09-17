@@ -108,11 +108,15 @@ def future_poll(user):
 
 
 @pytest.fixture
-def poll_with_votes(poll, user, user2):
+def poll_with_votes(poll, user):
     """Create a poll with some votes"""
     Vote.objects.create(poll=poll, user=user, option_index=0)
-    Vote.objects.create(poll=poll, user=user2, option_index=1)
     return poll
+
+
+@pytest.fixture
+def created_vote(poll, user2):
+    return Vote.objects.create(poll=poll, user=user2, option_index=1)
 
 
 @pytest.fixture

@@ -3,7 +3,7 @@ from django.utils import timezone
 import json
 from rest_framework import status
 from django.urls import reverse
-from polls.models import Vote  # ,Poll
+from polls.models import Vote, Poll
 
 
 @pytest.mark.django_db
@@ -136,3 +136,136 @@ class TestPollAPI:
 
         response = authenticated_client.patch(url, data, format='json')
         assert response.status_code == status.HTTP_403_FORBIDDEN
+
+    def test_delete_poll_authenticated(self, authenticated_client, user, poll):
+        """Test creating a poll as an authenticated user"""
+        url = reverse('poll-detail', kwargs={'pk': poll.id})
+        print(f"deleting poll:{poll}")
+
+        response = authenticated_client.delete(url,  format='json')
+        print(response)
+        assert response.status_code == status.HTTP_204_NO_CONTENT
+
+    def test_delete_poll_unauthenticated(self,
+                                         client, user, poll):
+        """Test creating a poll as an authenticated user"""
+        url = reverse('poll-detail', kwargs={'pk': poll.id})
+        print(f"deleting poll:{poll}")
+
+        response = client.delete(url,  format='json')
+        print(response)
+        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+
+
+@pytest.mark.django_db
+class TestVoteAPI:
+    """Test cases for Vote API endpoints"""
+
+    def test_list_own_votes(self, authenticated_client, user, poll):
+        """Test that users can list their own votes"""
+        # Create a vote for the user
+        Vote.objects.create(poll=poll, user=user, option_index=0)
+
+        url = reverse('myvote-list')
+        response = authenticated_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['count'] == 1
+
+    def test_retrieve_own_vote(self, authenticated_client, user, poll):
+        """Test that users can retrieve their own votes by ID"""
+        vote = Vote.objects.create(poll=poll, user=user, option_index=0)
+
+        url = reverse('myvote-detail', kwargs={'pk': vote.id})
+        response = authenticated_client.get(url)
+
+        assert response.status_code == status.HTTP_200_OK
+        assert response.data['id'] == str(vote.id)
+
+    def test_vote_immutable_through_api(self, authenticated_client,
+                                        user, poll):
+        """Test that votes cannot be modified or deleted via API"""
+        vote = Vote.objects.create(
+            poll=poll,
+            user=user,
+            option_index=0
+        )
+
+        url = reverse('myvote-detail', kwargs={'pk': vote.id})
+
+        # Attempt to update vote
+        update_data = {'option_index': 1}
+        response = authenticated_client.patch(url, update_data, format='json')
+        print(f"immutable vote api test res:{response}")
+        # Should either be 405 (Method Not Allowed) or 403 (Forbidden)
+        assert response.status_code in [
+            status.HTTP_405_METHOD_NOT_ALLOWED, status.HTTP_403_FORBIDDEN]
+
+        # Attempt to delete vote
+        response = authenticated_client.delete(url)
+        assert response.status_code in [
+            status.HTTP_405_METHOD_NOT_ALLOWED, status.HTTP_403_FORBIDDEN]
+
+    def test_vote_creation_only_through_poll_endpoint(
+            self, authenticated_client, poll):
+        """Test that votes can only be created through poll vote endpoint"""
+        url = reverse('myvote-list')
+        data = {
+            'poll': str(poll.id),
+            'option_index': 0
+        }
+
+        # Attempt to create vote directly
+        response = authenticated_client.post(url, data, format='json')
+        assert response.status_code in [
+            status.HTTP_405_METHOD_NOT_ALLOWED, status.HTTP_403_FORBIDDEN]
+
+    def test_cannot_retrieve_other_user_vote(self, authenticated_client,
+                                             authenticated_client2, user,
+                                             user2, poll):
+        """Test that users cannot retrieve other users' votes"""
+        # user2 creates a vote
+        vote = Vote.objects.create(poll=poll, user=user2, option_index=0)
+
+        # user1 tries to access user2's vote
+        url = reverse('myvote-detail', kwargs={'pk': vote.id})
+        response = authenticated_client.get(url)
+
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_by_poll_action(self, authenticated_client, user, poll):
+        """Test the by_poll custom action"""
+        # Create votes for different polls
+        Vote.objects.create(poll=poll, user=user, option_index=0)
+
+        other_poll = Poll.objects.create(
+            question="Other Poll",
+            options=["A", "B"],
+            owner=user,
+            creator=user,
+            start_date=timezone.now(),
+            expiry_date=timezone.now() + timezone.timedelta(days=1)
+        )
+        Vote.objects.create(poll=other_poll, user=user, option_index=1)
+
+        # Test filtering by poll
+        url = reverse('myvote-by-poll')
+        response = authenticated_client.get(url, {'poll_id': str(poll.id)})
+
+        assert response.status_code == status.HTTP_200_OK
+        assert len(response.data) == 1
+        assert response.data[0]['poll_id'] == str(poll.id)
+
+    def test_by_poll_action_invalid_id(self, authenticated_client):
+        """Test by_poll action with invalid poll ID"""
+        url = reverse('myvote-by-poll')
+        response = authenticated_client.get(url, {'poll_id': 'invalid'})
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+
+    def test_by_poll_action_missing_param(self, authenticated_client):
+        """Test by_poll action without required parameter"""
+        url = reverse('myvote-by-poll')
+        response = authenticated_client.get(url)
+
+        assert response.status_code == status.HTTP_400_BAD_REQUEST

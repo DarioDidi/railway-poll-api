@@ -1,7 +1,6 @@
 import pytest
 from django.utils import timezone
 from polls.models import Poll, Vote, BlockedIP
-from users.models import User
 
 
 @pytest.mark.django_db
@@ -97,6 +96,31 @@ class TestVoteModel:
         # IntegrityError or ValidationError
         with pytest.raises(Exception):
             Vote.objects.create(poll=poll, user=user, option_index=1)
+
+    def test_vote_save_prevents_updates(self, user, poll):
+        """Test that votes cannot be updated after creation"""
+        vote = Vote.objects.create(
+            poll=poll,
+            user=user,
+            option_index=0
+        )
+
+        vote.refresh_from_db()
+        vote.option_index = 1
+        with pytest.raises(PermissionError, match="Votes cannot be modified"):
+            vote.save()
+
+    def test_vote_delete_prevents_deletion(self, user, poll):
+        """Test that votes cannot be deleted"""
+        vote = Vote.objects.create(
+            poll=poll,
+            user=user,
+            option_index=0
+        )
+
+        # Attempt to delete the vote
+        with pytest.raises(PermissionError, match="Votes cannot be deleted"):
+            vote.delete()
 
 
 @pytest.mark.django_db
