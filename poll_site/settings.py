@@ -186,24 +186,13 @@ JWT_AUTH_COOKIE = 'polls-auth'
 JWT_AUTH_REFRESH_COOKIE = 'polls-refresh-token'
 
 # Django Allauth Settings
-# ACCOUNT_AUTHENTICATION_METHOD = 'email'
-# ACCOUNT_EMAIL_REQUIRED = True
-# ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_LOGIN_METHODS = ["email"]
 
-# For newer allauth versions (comment out if using the old format below)
-# ACCOUNT_SIGNUP_FIELDS = {
-#    'email': {'required': True, 'label': 'Email'},
-#    'password1': {'required': True, 'label': 'Password'},
-#    'password2': {'required': True, 'label': 'Password (again)'},
-# }
 
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
-# For older allauth versions (comment out if using the new format above)
-# ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
 # Email backend for development
 if DEBUG:

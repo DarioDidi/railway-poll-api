@@ -5,11 +5,15 @@ from rest_framework import filters as rest_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from django.core.exceptions import ValidationError
 
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
+
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from .models import Poll, Vote
+
 from .serializers import (
     PollSerializer,
     VoteSerializer,
@@ -44,6 +48,17 @@ class PollViewSet(viewsets.ModelViewSet):
     ordering_fields = ['created_at', 'updated_at', 'start_date', 'expiry_date']
     ordering = ['-created_at']
 
+    @swagger_auto_schema(
+        operation_description="Create a new poll",
+        request_body=PollCreateSerializer,
+        responses={
+            201: PollSerializer,
+            400: "Bad Request"
+        }
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.action == 'create':
             return PollCreateSerializer
@@ -72,6 +87,52 @@ class PollViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save()
 
+    @swagger_auto_schema(
+        operation_description=("Retrieve a list of polls"
+                               "with filtering options"),
+        manual_parameters=[
+            openapi.Parameter(
+                'question',
+                openapi.IN_QUERY,
+                description="Filter by question text (contains)",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
+                'status',
+                openapi.IN_QUERY,
+                description="Filter by status (active, upcoming, expired)",
+                type=openapi.TYPE_STRING,
+                enum=['active', 'upcoming', 'expired']
+            ),
+            openapi.Parameter(
+                'created_after',
+                openapi.IN_QUERY,
+                description="Filter polls created after this date",
+                type=openapi.TYPE_STRING,
+                format=openapi.FORMAT_DATETIME
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Cast a vote on a specific poll",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'option_index': openapi.Schema(
+                    type=openapi.TYPE_INTEGER,
+                    description="Index of the selected option (0-based)"
+                )
+            }
+        ),
+        responses={
+            201: "Vote recorded successfully",
+            400: "Bad Request - Invalid option or already voted",
+            404: "Poll not found"
+        }
+    )
     @action(detail=True, methods=['post'])
     def vote(self, request, pk=None):
         """
@@ -133,11 +194,6 @@ class PollViewSet(viewsets.ModelViewSet):
         return self.get_paginated_response(serializer.data)
 
 
-# class VoteViewSet(mixins.ListModelMixin,
-        # mixins.RetrieveModelMixin,
-        # viewsets.GenericViewSet):
-
-
 class VoteViewSet(mixins.ListModelMixin,
                   mixins.RetrieveModelMixin,
                   viewsets.GenericViewSet):
@@ -147,9 +203,6 @@ class VoteViewSet(mixins.ListModelMixin,
     Votes are created through poll vote endpoint
     """
     serializer_class = UserVoteSerializer
-    # permission_classes = [IsAuthenticated, CanViewOwnVotes, VotesAreReadOnly]
-
-    # REORDER: Method-level permission first, then object-level
     permission_classes = [IsAuthenticated, VotesAreReadOnly, CanViewOwnVotes]
 
     def get_queryset(self):
