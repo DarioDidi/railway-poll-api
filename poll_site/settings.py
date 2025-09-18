@@ -177,6 +177,7 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/day',
         'suspicious': '5/minute',
+        # 'suspicious': '5/m',
     },
     'DEFAULT_PAGINATION_CLASS': ('rest_framework.'
                                  'pagination.PageNumberPagination'),

@@ -127,3 +127,35 @@ def blocked_ip():
         reason="Test blocking",
         is_active=True
     )
+
+
+@pytest.fixture
+def mock_request():
+    """Create a mock request object for testing middleware"""
+    from unittest.mock import Mock
+    request = Mock()
+    request.META = {}
+    return request
+
+
+@pytest.fixture
+def mock_response():
+    """Create a mock response object"""
+    from unittest.mock import Mock
+    response = Mock()
+    response.status_code = 200
+    return response
+
+
+@pytest.fixture
+def suspicious_request():
+    """Create a request that would be considered suspicious"""
+    from unittest.mock import Mock
+    request = Mock()
+    request.META = {
+        'REMOTE_ADDR': '192.168.1.100',
+        'HTTP_X_FORWARDED_FOR': '192.168.1.100'
+    }
+    request.path = '/api/auth/login/'
+    request.user = None  # Anonymous user
+    return request
