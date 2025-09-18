@@ -4,7 +4,7 @@ from unittest.mock import Mock, patch
 from django.test import RequestFactory, TestCase
 from django.http import HttpResponse
 from polls.models import BlockedIP
-from utils.middleware import BlockedIPMiddleware
+from utils.middleware import BlockedIPMiddleware, SuspiciousRequestMiddleware
 from utils.throttling import SuspiciousRequestThrottle
 
 
@@ -15,6 +15,8 @@ class TestTrafficControlIntegration(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
         self.middleware = BlockedIPMiddleware(
+            get_response=lambda request: HttpResponse())
+        self.monitoring_middleware = SuspiciousRequestMiddleware(
             get_response=lambda request: HttpResponse())
         self.throttle = SuspiciousRequestThrottle()
 
@@ -54,7 +56,8 @@ class TestTrafficControlIntegration(TestCase):
 
     @patch('utils.throttling.logger')
     @patch('utils.middleware.logger')
-    def test_suspicious_activity_logging(self, mock_middleware_logger, mock_throttling_logger):
+    def test_suspicious_activity_logging(
+            self, mock_middleware_logger, mock_throttling_logger):
         """Test that suspicious activity is logged throughout the system"""
         # Create a suspicious request
         request = self.factory.post('/api/auth/login/')
@@ -63,11 +66,9 @@ class TestTrafficControlIntegration(TestCase):
         request.user.is_authenticated = False
 
         # Test middleware logging
-        middleware = BlockedIPMiddleware(
-            get_response=lambda request: HttpResponse(status=400))
         response = HttpResponse(status=400)
 
-        middleware.process_response(request, response)
+        self.monitoring_middleware.process_response(request, response)
 
         # Middleware should log the suspicious request
         mock_middleware_logger.warning.assert_called()

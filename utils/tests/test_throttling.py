@@ -140,7 +140,7 @@ class TestSuspiciousRequestThrottle:
 
             # Simulate 5 previous requests in the last minute
             mock_cache.get.return_value = [
-                timezone.now().timestamp() for x in range(5)]
+                timezone.now().timestamp() for _ in range(5)]
             print("in test mocked ret value:", mock_cache.get(mock_key))
 
             # Sixth request should be throttled

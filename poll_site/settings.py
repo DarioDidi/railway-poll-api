@@ -71,6 +71,11 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
+    # Custom middleware for IP blocking and monitoring
+    'utils.middleware.BlockedIPMiddleware',
+    'utils.middleware.SuspiciousRequestMiddleware',
+
+    # allauth middleware
     'allauth.account.middleware.AccountMiddleware',
 ]
 

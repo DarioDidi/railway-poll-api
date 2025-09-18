@@ -41,3 +41,41 @@ class BlockedIPMiddleware(MiddlewareMixin):
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
+
+class SuspiciousRequestMiddleware(MiddlewareMixin):
+    """
+    Middleware to detect and log suspicious request patterns.
+    Integrates with throttling system to identify potential abuse.
+    """
+
+    def process_response(self, request, response):
+        # Monitor for certain status codes and endpoints
+        # that indicate suspicious activity
+        if (response.status_code in [400, 401, 403, 429] and
+                request.path.startswith('/api/')):
+
+            ip_address = self.get_client_ip(request)
+            user = getattr(request, 'user', None)
+
+            if ip_address:
+                logger.warning(
+                    f"Suspicious request detected: "
+                    f"IP={ip_address}, "
+                    f"User={user.id if user else 'Anonymous'}, "
+                    f"Path={request.path}, "
+                    f"Status={response.status_code}"
+                )
+
+                # You could add logic here to automatically block IPs after
+                # too many suspicious requests (e.g., using django-ratelimit)
+
+        return response
+
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
