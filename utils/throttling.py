@@ -15,8 +15,6 @@ class SuspiciousRequestThrottle(SimpleRateThrottle):
 
     def get_cache_key(self, request, view):
         # Use IP address for anonymous users, user ID for authenticated users
-        print("in get cache")
-        print(f"getting cache key with views{view}")
         if request.user.is_authenticated:
             ident = request.user.pk
         else:
@@ -34,6 +32,10 @@ class SuspiciousRequestThrottle(SimpleRateThrottle):
         On success calls `throttle_success`.
         On failure calls `throttle_failure`.
         """
+        ip_address = self.get_ident(request)
+        # skip local
+        if ip_address == '127.0.0.1':
+            return True
         self.rate = self.get_rate()
         self.num_requests, self.duration = self.parse_rate(self.rate)
         if self.rate is None:
@@ -43,6 +45,7 @@ class SuspiciousRequestThrottle(SimpleRateThrottle):
         if self.key is None:
             return True
 
+        print("\n\n\n\nTHROTTLING:\n\n\n")
         self.history = self.cache.get(self.key, [])
         self.now = self.timer()
 
@@ -53,18 +56,19 @@ class SuspiciousRequestThrottle(SimpleRateThrottle):
         if len(self.history) >= self.num_requests:
             # pass correct argument required by override
             return self.throttle_failure(request, view)
+        print("going to throttle success")
         return self.throttle_success()
 
     def throttle_failure(self, request, response):
         """
         Override to automatically block IPs that exceed the rate limit.
         """
-        print(f"throttle failure request:{request}, response:{response}")
         res = super().throttle_failure()
 
         # Block the IP if it's making suspicious requests
         ip_address = self.get_ident(request)
-        if ip_address and not request.user.is_authenticated:
+        if (ip_address and
+                not request.user.is_authenticated):
             self.block_suspicious_ip(ip_address)
 
         return res

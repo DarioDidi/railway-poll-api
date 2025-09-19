@@ -13,7 +13,9 @@ class CustomerUserManager(UserManager):
 
         email = self.normalize_email(email)
         print(f"using email:{email}")
-        user = self.model(email=email, username=email, **extra_fields)
+        if 'username' not in extra_fields:
+            extra_fields['username'] = self.generate_unique_username(email)
+        user = self.model(email=email,  **extra_fields)
         user.set_password(password)
         user.save(using=self.db)
         return user
@@ -38,6 +40,20 @@ class CustomerUserManager(UserManager):
             email = '@'.join([email_name.lower(), domain_part.lower()])
         return email
 
+    @classmethod
+    def generate_unique_username(cls, email):
+        """Generate a unique username from email"""
+        base_username = email.split('@')[0]
+        username = base_username
+        counter = 1
+
+        # Ensure username is unique
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        return username
+
 
 class User(AbstractUser):
     """
@@ -54,7 +70,7 @@ class User(AbstractUser):
     username = models.CharField(blank=True, null=True)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username']
 
     # Add related_name to avoid clashes with built-in User model
     groups = models.ManyToManyField(
@@ -76,3 +92,10 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
+    def save(self, *args, **kwargs):
+        """Auto-generate username if not provided"""
+        if not self.username:
+            self.username = CustomerUserManager.generate_unique_username(
+                self.email)
+        super().save(*args, **kwargs)

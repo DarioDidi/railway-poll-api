@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import warnings
 from pathlib import Path
+from django.utils.timezone import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,11 +42,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # allauth
+    # 'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
 
     # rest auth
+    'rest_framework_simplejwt',
     'dj_rest_auth',
     'dj_rest_auth.registration',
 
@@ -54,7 +57,6 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'django_filters',
-    'rest_framework_simplejwt',
 
     # custom apps
     'users',
@@ -162,6 +164,7 @@ SITE_ID = 1
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
     ),
@@ -199,15 +202,24 @@ AUTHENTICATION_BACKENDS = [
 # JWT settings
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'polls-auth'
-JWT_AUTH_REFRESH_COOKIE = 'polls-refresh-token'
+# JWT_AUTH_REFRESH_COOKIE = 'polls-refresh-token'
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,
+}
 
 # Django Allauth Settings
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_LOGIN_METHODS = ["email"]
+# ACCOUNT_USERNAME_REQUIRED = False
 
 
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_SIGNUP_FIELDS = ['email*',  'password1*', 'password2*']
 
 
 # Email backend for development
@@ -217,11 +229,24 @@ else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 # Dj-rest-auth settings
+# REST_AUTH = {
+#    'USE_JWT': True,
+#    'JWT_AUTH_COOKIE': 'polls-auth',
+#    'JWT_AUTH_REFRESH_COOKIE': 'polls-refresh-token',
+#    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+# }
+
+# Dj-rest-auth settings
 REST_AUTH = {
     'USE_JWT': True,
+    # Make sure this is False to get refresh token in response
+    # CHANGE IN PRODUCTION!!!!
+    # 'JWT_AUTH_HTTPONLY': False,
     'JWT_AUTH_COOKIE': 'polls-auth',
     'JWT_AUTH_REFRESH_COOKIE': 'polls-refresh-token',
-    # 'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+    'JWT_AUTH_REFRESH_COOKIE_PATH': '/',
+    'JWT_AUTH_SAMESITE': 'Lax',
+    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
 }
 
 # To completely suppress the warnings
