@@ -1,21 +1,42 @@
+from django.contrib.auth.models import UserManager
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Group, Permission
-from django.contrib.auth.models import UserManager
 
 
 class CustomerUserManager(UserManager):
 
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, **extra_fields):
         """Create a new user profile"""
         if not email:
             raise ValueError('User must have an email address')
 
         email = self.normalize_email(email)
-        user = self.model(email=email)
+        print(f"using email:{email}")
+        user = self.model(email=email, username=email, **extra_fields)
         user.set_password(password)
         user.save(using=self.db)
         return user
+
+    def create_superuser(self, email, password=None,
+                         username='Super', **extra_fields):
+        return super().create_superuser(
+            email=email, password=password, username='super', **extra_fields)
+
+    @classmethod
+    def normalize_email(cls, email):
+        """
+        Normalize the email address by lowercasing the domain part of the it.
+        """
+        email = email or ''
+        try:
+            email_name, domain_part = email.strip().rsplit('@', 1)
+        except ValueError:
+            pass
+        else:
+            # custom impl, lower both sides of '@'
+            email = '@'.join([email_name.lower(), domain_part.lower()])
+        return email
 
 
 class User(AbstractUser):
@@ -30,7 +51,7 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    username = None  # use email for auth
+    username = models.CharField(blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
