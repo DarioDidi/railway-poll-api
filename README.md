@@ -51,3 +51,10 @@ A comprehensive poll management system built with Django REST Framework, Postgre
 | GET | `/api/polls/{id}/results/` | Get results | No |
 | GET | `/api/analytics/` | Get analytics | Required |
 | GET | `/api/docs/` | API documentation | No |
+
+## Documentation endpoints:
+
+    A JSON view of your API specification at /swagger.json
+    A YAML view of your API specification at /swagger.yaml
+    A swagger-ui view of your API specification at /swagger/
+    A ReDoc view of your API specification at /redoc/

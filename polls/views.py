@@ -4,14 +4,17 @@ from rest_framework import viewsets, status, mixins
 from rest_framework import filters as rest_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from django.utils.decorators import method_decorator
+
 from django_filters.rest_framework import DjangoFilterBackend
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+
 from .models import Poll, Vote
 
 from .serializers import (
@@ -22,7 +25,7 @@ from .serializers import (
     UserVoteSerializer
 )
 from .permissions import (
-    IsOwnerOrReadOnly,
+    # IsOwnerOrReadOnly,
     CanVote,
     CanEditPoll,
     CanDeletePoll,
@@ -33,6 +36,9 @@ from .permissions import (
 from .filters import PollFilter
 
 
+@method_decorator(name='destroy', decorator=swagger_auto_schema(
+    operation_description="Delete a poll"
+))
 class PollViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing polls with comprehensive permission controls.
@@ -59,6 +65,13 @@ class PollViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
+    # @swagger_auto_schema(
+    #    operation_description="Delete a poll using UUID",
+    # )
+    # def destroy(self, request, *args, **kwargs):
+    #    """Delete a poll using its UUID"""
+    #    return super().destroy(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.action == 'create':
             return PollCreateSerializer
@@ -80,7 +93,8 @@ class PollViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated, CanVote]
         else:
             # list, retrieve, results - read operations
-            permission_classes = [IsOwnerOrReadOnly]
+            # permission_classes = [IsOwnerOrReadOnly]
+            permission_classes = [AllowAny,]
 
         return [permission() for permission in permission_classes]
 
