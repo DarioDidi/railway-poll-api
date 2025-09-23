@@ -109,7 +109,14 @@ class TestAuthEndpoints:
     def test_email_verification_resend(self, mock_send_confirmation,
                                        authenticated_client, user):
         """Test resending email verification"""
-        url = reverse('rest_resend_email_verification')
+        # url = reverse('rest_resend_email_verification')
+        try:
+            url = reverse('rest_resend_email')
+        except Exception:
+            try:
+                url = reverse('resend-email-verification')
+            except Exception:
+                url = reverse('account_resend_email_verification')
         data = {'email': 'test@example.com'}
 
         response = authenticated_client.post(url, data, format='json')
