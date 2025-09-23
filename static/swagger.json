@@ -1,0 +1,1343 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Polls API",
+        "description": "API for creating polls, voting, and fetching results",
+        "license": {
+            "name": "BSD License"
+        },
+        "version": "v1"
+    },
+    "basePath": "/api",
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "Basic": {
+            "type": "basic"
+        }
+    },
+    "security": [
+        {
+            "Basic": []
+        }
+    ],
+    "paths": {
+        "/auth/login/": {
+            "post": {
+                "operationId": "auth_login_create",
+                "description": "Check the credentials and return the REST Token\nif the credentials are valid and authenticated.\nCalls Django Auth login method to register User ID\nin Django session framework\n\nAccept the following POST parameters: username, password\nReturn the REST Framework Token Object's key.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Login"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/logout/": {
+            "get": {
+                "operationId": "auth_logout_list",
+                "summary": "Calls Django logout method and delete the Token object\nassigned to the current User object.",
+                "description": "Accepts/Returns nothing.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "post": {
+                "operationId": "auth_logout_create",
+                "summary": "Calls Django logout method and delete the Token object\nassigned to the current User object.",
+                "description": "Accepts/Returns nothing.",
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/password/change/": {
+            "post": {
+                "operationId": "auth_password_change_create",
+                "summary": "Calls Django Auth SetPasswordForm save method.",
+                "description": "Accepts the following POST parameters: new_password1, new_password2\nReturns the success/fail message.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PasswordChange"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/PasswordChange"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/password/reset/": {
+            "post": {
+                "operationId": "auth_password_reset_create",
+                "summary": "Calls Django Auth PasswordResetForm save method.",
+                "description": "Accepts the following POST parameters: email\nReturns the success/fail message.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PasswordReset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/PasswordReset"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/password/reset/confirm/": {
+            "post": {
+                "operationId": "auth_password_reset_confirm_create",
+                "summary": "Password reset e-mail link is confirmed, therefore\nthis resets the user's password.",
+                "description": "Accepts the following POST parameters: token, uid,\n    new_password1, new_password2\nReturns the success/fail message.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PasswordResetConfirm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/PasswordResetConfirm"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/registration/": {
+            "post": {
+                "operationId": "auth_registration_create",
+                "summary": "Registers a new user.",
+                "description": "Accepts the following POST parameters: username, email, password1, password2.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CustomRegister"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CustomRegister"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/registration/resend-email/": {
+            "post": {
+                "operationId": "auth_registration_resend-email_create",
+                "summary": "Resends another email to an unverified email.",
+                "description": "Accepts the following POST parameter: email.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/ResendEmailVerification"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/ResendEmailVerification"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/registration/verify-email/": {
+            "post": {
+                "operationId": "auth_registration_verify-email_create",
+                "summary": "Verifies the email associated with the provided key.",
+                "description": "Accepts the following POST parameter: key.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/VerifyEmail"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/VerifyEmail"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/token/refresh/": {
+            "post": {
+                "operationId": "auth_token_refresh_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CookieTokenRefresh"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CookieTokenRefresh"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/token/verify/": {
+            "post": {
+                "operationId": "auth_token_verify_create",
+                "description": "Takes a token and indicates if it is valid.  This view provides no\ninformation about a token's fitness for a particular use.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TokenVerify"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/TokenVerify"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/auth/user/": {
+            "get": {
+                "operationId": "auth_user_read",
+                "summary": "Reads and updates UserModel fields\nAccepts GET, PUT, PATCH methods.",
+                "description": "Default accepted fields: username, first_name, last_name\nDefault display fields: pk, username, email, first_name, last_name\nRead-only fields: pk, email\n\nReturns UserModel fields.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/UserDetails"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "put": {
+                "operationId": "auth_user_update",
+                "summary": "Reads and updates UserModel fields\nAccepts GET, PUT, PATCH methods.",
+                "description": "Default accepted fields: username, first_name, last_name\nDefault display fields: pk, username, email, first_name, last_name\nRead-only fields: pk, email\n\nReturns UserModel fields.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserDetails"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/UserDetails"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "patch": {
+                "operationId": "auth_user_partial_update",
+                "summary": "Reads and updates UserModel fields\nAccepts GET, PUT, PATCH methods.",
+                "description": "Default accepted fields: username, first_name, last_name\nDefault display fields: pk, username, email, first_name, last_name\nRead-only fields: pk, email\n\nReturns UserModel fields.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/UserDetails"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/UserDetails"
+                        }
+                    }
+                },
+                "tags": [
+                    "auth"
+                ]
+            },
+            "parameters": []
+        },
+        "/my-votes/": {
+            "get": {
+                "operationId": "my-votes_list",
+                "description": "ViewSet for users to view their own votes.\nVotes are permanent and cannot be modified or deleted.\nVotes are created through poll vote endpoint",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "A search term.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ordering",
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "required": [
+                                "count",
+                                "results"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "count": {
+                                    "type": "integer"
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "previous": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/UserVote"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "my-votes"
+                ]
+            },
+            "parameters": []
+        },
+        "/my-votes/by_poll/": {
+            "get": {
+                "operationId": "my-votes_by_poll",
+                "description": "Get all votes by the current user for a specific poll.",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "A search term.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ordering",
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "required": [
+                                "count",
+                                "results"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "count": {
+                                    "type": "integer"
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "previous": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/UserVote"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "my-votes"
+                ]
+            },
+            "parameters": []
+        },
+        "/my-votes/{id}/": {
+            "get": {
+                "operationId": "my-votes_read",
+                "description": "ViewSet for users to view their own votes.\nVotes are permanent and cannot be modified or deleted.\nVotes are created through poll vote endpoint",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/UserVote"
+                        }
+                    }
+                },
+                "tags": [
+                    "my-votes"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "required": true,
+                    "type": "string"
+                }
+            ]
+        },
+        "/polls/": {
+            "get": {
+                "operationId": "polls_list",
+                "description": "Retrieve a list of pollswith filtering options",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "A search term.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ordering",
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "question",
+                        "in": "query",
+                        "description": "Filter by question text (contains)",
+                        "type": "string"
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by status (active, upcoming, expired)",
+                        "type": "string",
+                        "enum": [
+                            "active",
+                            "upcoming",
+                            "expired"
+                        ]
+                    },
+                    {
+                        "name": "created_after",
+                        "in": "query",
+                        "description": "Filter polls created after this date",
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "required": [
+                                "count",
+                                "results"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "count": {
+                                    "type": "integer"
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "previous": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/Poll"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "post": {
+                "operationId": "polls_create",
+                "description": "Create a new poll",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PollCreate"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Poll"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "parameters": []
+        },
+        "/polls/active/": {
+            "get": {
+                "operationId": "polls_active",
+                "description": "Get all active polls (current time between start and expiry dates).",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "A search term.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ordering",
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "required": [
+                                "count",
+                                "results"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "count": {
+                                    "type": "integer"
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "previous": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/Poll"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "parameters": []
+        },
+        "/polls/my_polls/": {
+            "get": {
+                "operationId": "polls_my_polls",
+                "description": "Get all active polls (current time between start and expiry dates).",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "A search term.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ordering",
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "required": [
+                                "count",
+                                "results"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "count": {
+                                    "type": "integer"
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "previous": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/Poll"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "parameters": []
+        },
+        "/polls/{id}/": {
+            "get": {
+                "operationId": "polls_read",
+                "description": "ViewSet for managing polls with comprehensive permission controls.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Poll"
+                        }
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "put": {
+                "operationId": "polls_update",
+                "description": "ViewSet for managing polls with comprehensive permission controls.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Poll"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Poll"
+                        }
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "patch": {
+                "operationId": "polls_partial_update",
+                "description": "ViewSet for managing polls with comprehensive permission controls.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Poll"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Poll"
+                        }
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "delete": {
+                "operationId": "polls_delete",
+                "description": "Delete a poll",
+                "parameters": [],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "description": "A UUID string identifying this poll.",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        },
+        "/polls/{id}/results/": {
+            "get": {
+                "operationId": "polls_results",
+                "description": "Get real-time results for a specific poll",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/PollResults"
+                        }
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "description": "A UUID string identifying this poll.",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        },
+        "/polls/{id}/vote/": {
+            "post": {
+                "operationId": "polls_vote",
+                "description": "Cast a vote on a specific poll",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "option_index": {
+                                    "description": "Index of the selected option (0-based)",
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Vote recorded successfully"
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid option or already voted"
+                    },
+                    "404": {
+                        "description": "Poll not found"
+                    }
+                },
+                "tags": [
+                    "polls"
+                ]
+            },
+            "parameters": [
+                {
+                    "name": "id",
+                    "in": "path",
+                    "description": "A UUID string identifying this poll.",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        }
+    },
+    "definitions": {
+        "Login": {
+            "required": [
+                "password"
+            ],
+            "type": "object",
+            "properties": {
+                "username": {
+                    "title": "Username",
+                    "type": "string"
+                },
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "format": "email"
+                },
+                "password": {
+                    "title": "Password",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "PasswordChange": {
+            "required": [
+                "new_password1",
+                "new_password2"
+            ],
+            "type": "object",
+            "properties": {
+                "new_password1": {
+                    "title": "New password1",
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1
+                },
+                "new_password2": {
+                    "title": "New password2",
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1
+                }
+            }
+        },
+        "PasswordReset": {
+            "required": [
+                "email"
+            ],
+            "type": "object",
+            "properties": {
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "format": "email",
+                    "minLength": 1
+                }
+            }
+        },
+        "PasswordResetConfirm": {
+            "required": [
+                "new_password1",
+                "new_password2",
+                "uid",
+                "token"
+            ],
+            "type": "object",
+            "properties": {
+                "new_password1": {
+                    "title": "New password1",
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1
+                },
+                "new_password2": {
+                    "title": "New password2",
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1
+                },
+                "uid": {
+                    "title": "Uid",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "token": {
+                    "title": "Token",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "CustomRegister": {
+            "required": [
+                "email",
+                "password1",
+                "password2"
+            ],
+            "type": "object",
+            "properties": {
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "format": "email",
+                    "minLength": 1
+                },
+                "password1": {
+                    "title": "Password1",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "password2": {
+                    "title": "Password2",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "ResendEmailVerification": {
+            "required": [
+                "email"
+            ],
+            "type": "object",
+            "properties": {
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "format": "email",
+                    "minLength": 1
+                }
+            }
+        },
+        "VerifyEmail": {
+            "required": [
+                "key"
+            ],
+            "type": "object",
+            "properties": {
+                "key": {
+                    "title": "Key",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "CookieTokenRefresh": {
+            "type": "object",
+            "properties": {
+                "refresh": {
+                    "title": "Refresh",
+                    "description": "WIll override cookie.",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "access": {
+                    "title": "Access",
+                    "type": "string",
+                    "readOnly": true,
+                    "minLength": 1
+                }
+            }
+        },
+        "TokenVerify": {
+            "required": [
+                "token"
+            ],
+            "type": "object",
+            "properties": {
+                "token": {
+                    "title": "Token",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "UserDetails": {
+            "type": "object",
+            "properties": {
+                "pk": {
+                    "title": "Id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "format": "email",
+                    "readOnly": true,
+                    "minLength": 1
+                },
+                "first_name": {
+                    "title": "First name",
+                    "type": "string",
+                    "maxLength": 150
+                },
+                "last_name": {
+                    "title": "Last name",
+                    "type": "string",
+                    "maxLength": 150
+                }
+            }
+        },
+        "UserVote": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "title": "Id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "poll_id": {
+                    "title": "Poll id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "poll_question": {
+                    "title": "Poll question",
+                    "type": "string",
+                    "readOnly": true,
+                    "minLength": 1
+                },
+                "selected_option": {
+                    "title": "Selected option",
+                    "type": "string",
+                    "readOnly": true
+                },
+                "created_at": {
+                    "title": "Created at",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            }
+        },
+        "Poll": {
+            "required": [
+                "question",
+                "options"
+            ],
+            "type": "object",
+            "properties": {
+                "id": {
+                    "title": "Id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "question": {
+                    "title": "Question",
+                    "type": "string",
+                    "maxLength": 500,
+                    "minLength": 1
+                },
+                "options": {
+                    "title": "Options",
+                    "type": "object"
+                },
+                "is_anonymous": {
+                    "title": "Is anonymous",
+                    "type": "boolean"
+                },
+                "created_at": {
+                    "title": "Created at",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "title": "Updated at",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "owner_email": {
+                    "title": "Owner email",
+                    "type": "string",
+                    "readOnly": true
+                },
+                "creator_email": {
+                    "title": "Creator email",
+                    "type": "string",
+                    "readOnly": true
+                },
+                "start_date": {
+                    "title": "Start date",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "expiry_date": {
+                    "title": "Expiry date",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "is_active": {
+                    "title": "Is active",
+                    "type": "boolean"
+                },
+                "total_votes": {
+                    "title": "Total votes",
+                    "type": "integer",
+                    "readOnly": true
+                },
+                "has_user_voted": {
+                    "title": "Has user voted",
+                    "type": "string",
+                    "readOnly": true
+                },
+                "status": {
+                    "title": "Status",
+                    "type": "string",
+                    "readOnly": true,
+                    "minLength": 1
+                }
+            }
+        },
+        "PollCreate": {
+            "required": [
+                "question",
+                "options"
+            ],
+            "type": "object",
+            "properties": {
+                "question": {
+                    "title": "Question",
+                    "type": "string",
+                    "maxLength": 500,
+                    "minLength": 1
+                },
+                "options": {
+                    "title": "Options",
+                    "type": "object"
+                },
+                "is_anonymous": {
+                    "title": "Is anonymous",
+                    "type": "boolean"
+                },
+                "start_date": {
+                    "title": "Start date",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "expiry_date": {
+                    "title": "Expiry date",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "owner_email": {
+                    "title": "Owner email",
+                    "type": "string",
+                    "readOnly": true
+                },
+                "creator_email": {
+                    "title": "Creator email",
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "PollResults": {
+            "required": [
+                "results"
+            ],
+            "type": "object",
+            "properties": {
+                "results": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "string",
+                            "minLength": 1
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
