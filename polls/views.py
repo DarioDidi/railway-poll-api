@@ -221,7 +221,19 @@ class VoteViewSet(mixins.ListModelMixin,
 
     def get_queryset(self):
         """Users can only see their own votes"""
-        return Vote.objects.filter(user=self.request.user)
+        # Short-circuit during Swagger schema generation
+        if getattr(self, 'swagger_fake_view', False):
+            return Vote.objects.none()
+
+        # Allow admins to see all votes
+        if self.request.user.is_staff:
+            return Vote.objects.all()
+
+        # Handle both authenticated and unauthenticated users
+        if hasattr(self.request.user, 'is_authenticated') \
+                and self.request.user.is_authenticated:
+            return Vote.objects.filter(user=self.request.user)
+        return Vote.objects.none()
 
     @action(detail=False, methods=['get'])
     def by_poll(self, request):

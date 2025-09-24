@@ -2,6 +2,8 @@ import os
 import warnings
 from pathlib import Path
 from django.utils.timezone import timedelta
+from dotenv import load_dotenv
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -240,14 +242,25 @@ ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/api/auth/verified/'
 
 # Disable allauth templates
 # This will automatically confirm email on link click
+# ACCOUNT_CONFIRM_EMAIL_ON_GET set to True
+# the user will confirm the e-mail just by clicking the link
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+CONFIRM_EMAIL_ON_GET = True
 
 # Email backend for development
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
+    EMAIL_TIMEOUT = 30
+# Email configuration
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # Dj-rest-auth settings
 REST_AUTH = {
@@ -274,4 +287,19 @@ warnings.filterwarnings("ignore",
 
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": 'poll_site.urls.api_info'
+}
+
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
 }
