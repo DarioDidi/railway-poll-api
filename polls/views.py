@@ -15,6 +15,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 
+# realtime updates
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 from .models import Poll, Vote
 
 from .serializers import (
@@ -92,7 +96,39 @@ class PollViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
-        serializer.save()
+        instance = serializer.save()
+        # Trigger real-time notification
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'polls_list',
+            {
+                'type': 'poll_created',
+                'data': {
+                    'id': str(instance.id),
+                    'question': instance.question,
+                    'created_at': instance.created_at.isoformat(),
+                    'owner_email': instance.owner.email
+                }
+            }
+        )
+
+    def perform_destroy(self, instance):
+        """Override to trigger real-time updates"""
+        poll_id = str(instance.id)
+        super().perform_destroy(instance)
+
+        # Trigger real-time notification
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            'polls_list',
+            {
+                'type': 'poll_deleted',
+                'data': {
+                    'id': poll_id,
+                    'timestamp': timezone.now().isoformat()
+                }
+            }
+        )
 
     @swagger_auto_schema(
         operation_description=("Retrieve a list of polls"
@@ -154,7 +190,25 @@ class PollViewSet(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             print("Serializer  VALID")
-            serializer.save()
+            vote = serializer.save()
+
+            # Trigger real-time updates via signal (already handled)
+            # Additional real-time notification if needed
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'poll_{poll.id}',
+                {
+                    'type': 'poll_update',
+                    'data': {
+                        'type': 'vote_cast',
+                        'poll_id': str(poll.id),
+                        'results': poll.get_results(),
+                        'total_votes': poll.votes.count(),
+                        'timestamp': vote.created_at.isoformat()
+                    }
+                }
+            )
+
             return Response(
                 {'message': 'Vote recorded successfully'},
                 status=status.HTTP_201_CREATED

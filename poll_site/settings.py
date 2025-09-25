@@ -101,6 +101,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'poll_site.wsgi.application'
 
+# Channel layers (using Redis as backend)
+ASGI_APPLICATION = 'poll_site.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Adjust for your Redis server
+        },
+    },
+}
+
+if not DEBUG:
+    CHANNEL_LAYERS['default']['CONFIG']['hosts'] = [
+        (os.environ.get('REDIS_URL', 'redis://localhost:6379'))
+    ]
+
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 DATABASES = {
