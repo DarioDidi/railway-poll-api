@@ -1,5 +1,5 @@
 
-# Create your views here.
+# polls/views.py
 from rest_framework import viewsets, status, mixins
 from rest_framework import filters as rest_filters
 from rest_framework.decorators import action
@@ -64,13 +64,6 @@ class PollViewSet(viewsets.ModelViewSet):
     )
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
-
-    # @swagger_auto_schema(
-    #    operation_description="Delete a poll using UUID",
-    # )
-    # def destroy(self, request, *args, **kwargs):
-    #    """Delete a poll using its UUID"""
-    #    return super().destroy(request, *args, **kwargs)
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -152,7 +145,6 @@ class PollViewSet(viewsets.ModelViewSet):
         """
         Cast a vote on a specific poll (authenticated users only).
         """
-        print("\n\n\nVOTINNG\n\n")
         poll = self.get_object()
         print("on poll", poll)
         serializer = VoteSerializer(

@@ -3,7 +3,7 @@ from rest_framework import serializers
 from django.utils import timezone
 from .models import Poll, Vote
 
-from polls.models import current_time
+from polls.models import current_time, one_week_from_now
 
 
 class PollCreateSerializer(serializers.ModelSerializer):
@@ -44,6 +44,10 @@ class PollCreateSerializer(serializers.ModelSerializer):
                 "Poll cannot be active for more than 7 days."
             )
 
+        if start_date > one_week_from_now():
+            raise serializers.ValidationError(
+                "Poll cannot start more than a week from current time"
+            )
         return data
 
     def create(self, validated_data):

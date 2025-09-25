@@ -1,12 +1,16 @@
 # poll_site/urls.py(main urls)
 from dj_rest_auth.jwt_auth import get_refresh_view
 from rest_framework_simplejwt.views import TokenVerifyView
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view
 from rest_framework import permissions
+
 from django.urls import path, include, re_path
 from django.contrib import admin
 
+from users.views import APIConfirmEmailView
+# from users.views import SimpleConfirmEmailView
+
+from drf_yasg import openapi
+from drf_yasg.views import get_schema_view
 # Swagger open ai info
 api_info = openapi.Info(
     title="Polls API",
@@ -23,15 +27,21 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    # Dj-rest-auth endpoints
-    path('api/auth/', include('dj_rest_auth.urls')),
-    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('auth/', include('django.contrib.auth.urls')),
-
+    # Override the default email confirmation URL
+    path('api/auth/registration/account-confirm-email/<str:key>/',
+         APIConfirmEmailView.as_view(),
+         name='account_confirm_email'),
+    # override token views
     path('api/auth/token/verify/', TokenVerifyView.as_view(),
          name='rest_token_verify'),
     path('api/auth/token/refresh/', get_refresh_view().as_view(),
          name='rest_token_refresh'),
+
+    # Dj-rest-auth endpoints
+    path('api/auth/', include('dj_rest_auth.urls')),
+
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
+    path('auth/', include('django.contrib.auth.urls')),
 
     # polls
     path('api/', include('polls.urls')),
