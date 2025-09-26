@@ -55,7 +55,7 @@ def create_email_verification_token(user):
         user=user, used=False).update(used=True)
 
     token = generate_unique_token()
-    verification_token = EmailVerificationToken.objects.create(
+    EmailVerificationToken.objects.create(
         user=user,
         token=token
     )
@@ -68,7 +68,7 @@ def create_password_reset_token(user):
     PasswordResetToken.objects.filter(user=user, used=False).update(used=True)
 
     token = generate_unique_token()
-    reset_token = PasswordResetToken.objects.create(
+    PasswordResetToken.objects.create(
         user=user,
         token=token
     )
@@ -112,7 +112,8 @@ def send_verification_email(user, request=None):
     token = create_email_verification_token(user)
 
     # Use API endpoint for verification instead of frontend URL
-    verification_url = f"{settings.API_BASE_URL}/api/auth/registration/verify-email/{token}/"
+    verification_url = (
+        f"{settings.API_BASE_URL}/api/auth/registration/verify-email/{token}/")
 
     subject = "Verify Your Email Address"
     html_message = render_to_string('emails/verify_email.html', {

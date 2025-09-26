@@ -1,11 +1,12 @@
 # users/urls.py
-from django.urls import path, include
-from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
+from django.urls import path
+# from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
 from . import views
 
 urlpatterns = [
     # Authentication endpoints
-    path('auth/registration/', views.UserRegistrationView.as_view(), name='register'),
+    path('auth/registration/', views.UserRegistrationView.as_view(),
+         name='register'),
     path('auth/registration/verify-email/<str:token>/',
          views.verify_email, name='verify-email'),
     path('auth/registration/verify-email/',

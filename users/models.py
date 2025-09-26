@@ -52,8 +52,8 @@ class CustomerUserManager(UserManager):
 
 
 class User(AbstractUser):
-    """Custom user model extending Django's 
-    AbstractUser with UUID primary key."""
+    """Custom user model extending Django's
+     AbstractUser with UUID primary key."""
     objects = CustomerUserManager()
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
