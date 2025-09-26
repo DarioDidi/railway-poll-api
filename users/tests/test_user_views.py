@@ -281,6 +281,7 @@ class TestChangePassword:
         }
 
         response = authenticated_client.put(change_password_url, change_data)
+        print(f"password change response:{response.data}")
 
         assert response.status_code == status.HTTP_200_OK
         assert response.data['detail'] == 'Password updated successfully.'

@@ -93,3 +93,5 @@ logs/
 staticfiles/
 todo*
 todo*/
+prompts.txt
+test_data.txt

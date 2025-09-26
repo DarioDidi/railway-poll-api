@@ -282,7 +282,7 @@ class ChangePasswordView(generics.UpdateAPIView):
         },
         tags=['password']
     )
-    def post(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
@@ -358,8 +358,6 @@ def password_reset_request(request):
     },
     tags=['password']
 )
-@api_view(['POST'])
-@permission_classes([permissions.AllowAny])
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def password_reset_confirm(request):
