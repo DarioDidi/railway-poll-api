@@ -15,7 +15,7 @@ A comprehensive poll management system built with Django REST Framework, Postgre
 
 ## Technology Stack
 
-- **Backend**: Django 4.2, Django REST Framework
+- **Backend**: Django 5.2, Django REST Framework
 - **Database**: PostgreSQL
 - **Task Queue**: Celery with Redis broker
 - **Authentication**: JWT with SimpleJWT

@@ -5,12 +5,45 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from .models import Poll, Vote
 
-from django.utils.timezone import timezone
+from django.utils import timezone
 
+
+# @receiver(post_save, sender=Vote)
+# def vote_created(sender, instance, created, **kwargs):
+#    """Notify when a new vote is cast"""
+#    if created:
+#        channel_layer = get_channel_layer()
+#
+#        # Notify poll-specific subscribers
+#        async_to_sync(channel_layer.group_send)(
+#            f'poll_{instance.poll.id}',
+#            {
+#                'type': 'poll_update',
+#                'data': {
+#                    'type': 'vote_cast',
+#                    'poll_id': str(instance.poll.id),
+#                    'vote_count': instance.poll.votes.count(),
+#                    'timestamp': instance.created_at.isoformat()
+#                }
+#            }
+#        )
+#
+#        # Notify analytics subscribers
+#        async_to_sync(channel_layer.group_send)(
+#            'analytics',
+#            {
+#                'type': 'analytics_update',
+#                'data': {
+#                    'type': 'new_vote',
+#                    'poll_id': str(instance.poll.id),
+#                    'timestamp': instance.created_at.isoformat()
+#                }
+#            }
+#        )
 
 @receiver(post_save, sender=Vote)
 def vote_created(sender, instance, created, **kwargs):
-    """Notify when a new vote is cast"""
+    """Notify WebSocket clients when a vote is created via API"""
     if created:
         channel_layer = get_channel_layer()
 
@@ -19,23 +52,11 @@ def vote_created(sender, instance, created, **kwargs):
             f'poll_{instance.poll.id}',
             {
                 'type': 'poll_update',
+                'event_type': 'vote_cast',
                 'data': {
-                    'type': 'vote_cast',
                     'poll_id': str(instance.poll.id),
-                    'vote_count': instance.poll.votes.count(),
-                    'timestamp': instance.created_at.isoformat()
-                }
-            }
-        )
-
-        # Notify analytics subscribers
-        async_to_sync(channel_layer.group_send)(
-            'analytics',
-            {
-                'type': 'analytics_update',
-                'data': {
-                    'type': 'new_vote',
-                    'poll_id': str(instance.poll.id),
+                    'total_votes': instance.poll.votes.count(),
+                    'option_index': instance.option_index,
                     'timestamp': instance.created_at.isoformat()
                 }
             }

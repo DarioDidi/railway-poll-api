@@ -19,10 +19,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-# DEBUG = True
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['.localhost',
+                 '.onrender.com']
 
 AUTH_USER_MODEL = "users.User"
 
@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'django_filters',
+    'django_celery_beat',
 
     # custom apps
     'users',
