@@ -141,6 +141,12 @@ class PollViewSet(viewsets.ModelViewSet):
                 type=openapi.TYPE_STRING
             ),
             openapi.Parameter(
+                'creator_email',
+                openapi.IN_QUERY,
+                description="Filter by creator_email (contains)",
+                type=openapi.TYPE_STRING
+            ),
+            openapi.Parameter(
                 'status',
                 openapi.IN_QUERY,
                 description="Filter by status (active, upcoming, expired)",
@@ -151,6 +157,13 @@ class PollViewSet(viewsets.ModelViewSet):
                 'created_after',
                 openapi.IN_QUERY,
                 description="Filter polls created after this date",
+                type=openapi.TYPE_STRING,
+                format=openapi.FORMAT_DATETIME
+            ),
+            openapi.Parameter(
+                'created_before',
+                openapi.IN_QUERY,
+                description="Filter polls created before this date",
                 type=openapi.TYPE_STRING,
                 format=openapi.FORMAT_DATETIME
             ),

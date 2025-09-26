@@ -25,6 +25,13 @@ class PollFilter(filters.FilterSet):
     expires_before = filters.DateTimeFilter(
         field_name='expiry_date', lookup_expr='lte')
 
+    creator_emails = filters.BaseInFilter(
+        field_name='creator__email', lookup_expr='in')
+
+    option_contains = filters.CharFilter(
+        method='filter_option_contains',
+        label='Search within poll options'
+    )
     status = filters.ChoiceFilter(
         choices=[
             ('active', 'Active'),
@@ -66,3 +73,6 @@ class PollFilter(filters.FilterSet):
             )
 
         return queryset
+
+    def filter_option_contains(self, queryset, name, value):
+        return queryset.filter(options__icontains=value)
