@@ -34,7 +34,7 @@ class SuspiciousRequestThrottle(SimpleRateThrottle):
         """
         ip_address = self.get_ident(request)
         # skip local
-        if ip_address == '127.0.0.1':
+        if ip_address == '127.0.0.1' or ip_address == "0.0.0.0":
             return True
         self.rate = self.get_rate()
         self.num_requests, self.duration = self.parse_rate(self.rate)
