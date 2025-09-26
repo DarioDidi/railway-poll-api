@@ -1,6 +1,5 @@
 import os
-import warnings
-import dj_database_url
+# import dj_database_url
 
 from pathlib import Path
 from django.utils.timezone import timedelta
@@ -15,9 +14,6 @@ API_BASE_URL = os.environ.get('API_BASE_URL', default='http://localhost:8000')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY =\
-#    'django-insecure-sqy5x^s+w_)z%qav(h$0y@f!e1@vf1&q&j708j_))!+da@wd9-'
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
@@ -45,14 +41,14 @@ INSTALLED_APPS = [
 
     # allauth
     # 'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
 
     # rest auth
     'rest_framework_simplejwt',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
+    # 'dj_rest_auth',
+    # 'dj_rest_auth.registration',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -80,7 +76,7 @@ MIDDLEWARE = [
     'utils.middleware.SuspiciousRequestMiddleware',
 
     # allauth middleware
-    'allauth.account.middleware.AccountMiddleware',
+    # 'allauth.account.middleware.AccountMiddleware',
     # serve these static assets from Render's web server.
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
@@ -100,7 +96,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 # `allauth` needs this from django
-                'django.template.context_processors.request',
+                # 'django.template.context_processors.request',
             ],
         },
     },
@@ -204,12 +200,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # Required for allauth
-SITE_ID = 1
+# SITE_ID = 1
 
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
+        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
@@ -242,7 +238,7 @@ AUTHENTICATION_BACKENDS = [
     # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
     # `allauth` specific authentication methods, such as login by email
-    'allauth.account.auth_backends.AuthenticationBackend',
+    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # JWT settings
@@ -259,24 +255,24 @@ SIMPLE_JWT = {
 }
 
 # Django Allauth Settings
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_LOGIN_METHODS = ["email"]
+# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_LOGIN_METHODS = ["email"]
 # ACCOUNT_USERNAME_REQUIRED = False
-
-
-ACCOUNT_SIGNUP_FIELDS = ['email*',  'password1*', 'password2*']
-
+#
+#
+# ACCOUNT_SIGNUP_FIELDS = ['email*',  'password1*', 'password2*']
+#
 # To avoid Rendering email confirmation template
-ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/api/auth/verified/'
-ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/api/auth/verified/'
-
+# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/api/auth/verified/'
+# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/api/auth/verified/'
+#
 # Disable allauth templates
 # This will automatically confirm email on link click
 # ACCOUNT_CONFIRM_EMAIL_ON_GET set to True
 # the user will confirm the e-mail just by clicking the link
-ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-CONFIRM_EMAIL_ON_GET = True
+# ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+# CONFIRM_EMAIL_ON_GET = True
 
 # Email backend for development
 if DEBUG:
@@ -294,31 +290,32 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
 # Dj-rest-auth settings
-REST_AUTH = {
-    'USE_JWT': True,
-    # Make sure this is False to get refresh token in response
-    # WARNING: CHANGE IN PRODUCTION!!!!
-
-    # 'JWT_AUTH_HTTPONLY': False,
-    'JWT_AUTH_COOKIE': 'polls-auth',
-    'JWT_AUTH_REFRESH_COOKIE': 'polls-refresh-token',
-    'JWT_AUTH_REFRESH_COOKIE_PATH': '/',
-    'JWT_AUTH_SAMESITE': 'Lax',
-    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
-
-    # Disable template rendering for email verification
-    'EMAIL_VERIFICATION_SENT_WHEN_REGISTERING': False,
-}
+# REST_AUTH = {
+#    'USE_JWT': True,
+#    # Make sure this is False to get refresh token in response
+#    # WARNING: CHANGE IN PRODUCTION!!!!
+#
+#    # 'JWT_AUTH_HTTPONLY': False,
+#    'JWT_AUTH_COOKIE': 'polls-auth',
+#    'JWT_AUTH_REFRESH_COOKIE': 'polls-refresh-token',
+#    'JWT_AUTH_REFRESH_COOKIE_PATH': '/',
+#    'JWT_AUTH_SAMESITE': 'Lax',
+#    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
+#
+#    # Disable template rendering for email verification
+#    'EMAIL_VERIFICATION_SENT_WHEN_REGISTERING': False,
+# }
 
 # To completely suppress the warnings
-warnings.filterwarnings("ignore",
-                        message="app_settings.USERNAME_REQUIRED is deprecated")
-warnings.filterwarnings("ignore",
-                        message="app_settings.EMAIL_REQUIRED is deprecated")
+# warnings.filterwarnings("ignore",
+#                        message="app_settings.USERNAME_REQUIRED is deprecated")
+# warnings.filterwarnings("ignore",
+#                        message="app_settings.EMAIL_REQUIRED is deprecated")
 
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": 'poll_site.urls.api_info'
 }
+SWAGGER_USE_COMPAT_RENDERERS = False
 
 
 LOGGING = {

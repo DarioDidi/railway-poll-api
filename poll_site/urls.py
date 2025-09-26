@@ -1,12 +1,12 @@
 # poll_site/urls.py(main urls)
-from dj_rest_auth.jwt_auth import get_refresh_view
-from rest_framework_simplejwt.views import TokenVerifyView
+# from dj_rest_auth.jwt_auth import get_refresh_view
+# from rest_framework_simplejwt.views import TokenVerifyView
 from rest_framework import permissions
 
 from django.urls import path, include, re_path
 from django.contrib import admin
 
-from users.views import APIConfirmEmailView
+# from users.views import APIConfirmEmailView
 # from users.views import SimpleConfirmEmailView
 
 from drf_yasg import openapi
