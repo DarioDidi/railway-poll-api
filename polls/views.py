@@ -305,3 +305,50 @@ class VoteViewSet(mixins.ListModelMixin,
                 {'error': 'Invalid poll_id format'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+@action(detail=True, methods=['get'])
+def export_results(self, request, pk=None):
+    """
+    Export poll results in various formats (JSON, CSV, Excel).
+    """
+    poll = self.get_object()
+    format = request.GET.get('format', 'json')
+
+    results = poll.get_results()
+
+    if format == 'csv':
+        import csv
+        from django.http import HttpResponse
+
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="poll_{poll.id}_results.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(['Option', 'Votes', 'Percentage'])
+
+        for result in results:
+            writer.writerow([
+                result['option'],
+                result['votes'],
+                f"{result['percentage']:.2f}%"
+            ])
+
+        return response
+
+    elif format == 'json':
+        return Response({
+            'poll': {
+                'id': str(poll.id),
+                'question': poll.question,
+                'total_votes': sum(result['votes'] for result in results)
+            },
+            'results': results,
+            'exported_at': timezone.now()
+        })
+
+    else:
+        return Response(
+            {'error': 'Unsupported format. Use "json" or "csv".'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
