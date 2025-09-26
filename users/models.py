@@ -1,21 +1,21 @@
-from django.contrib.auth.models import UserManager
+# users/models.py
+from django.contrib.auth.models import (UserManager, AbstractUser,
+                                        Group, Permission)
 import uuid
 from django.db import models
-from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.utils import timezone
 
 
 class CustomerUserManager(UserManager):
-
     def create_user(self, email, password=None, **extra_fields):
         """Create a new user profile"""
         if not email:
             raise ValueError('User must have an email address')
 
         email = self.normalize_email(email)
-        print(f"using email:{email}")
         if 'username' not in extra_fields:
             extra_fields['username'] = self.generate_unique_username(email)
-        user = self.model(email=email,  **extra_fields)
+        user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self.db)
         return user
@@ -27,16 +27,13 @@ class CustomerUserManager(UserManager):
 
     @classmethod
     def normalize_email(cls, email):
-        """
-        Normalize the email address by lowercasing the domain part of the it.
-        """
+        """Normalize the email address by lowercasing both parts"""
         email = email or ''
         try:
             email_name, domain_part = email.strip().rsplit('@', 1)
         except ValueError:
             pass
         else:
-            # custom impl, lower both sides of '@'
             email = '@'.join([email_name.lower(), domain_part.lower()])
         return email
 
@@ -47,7 +44,6 @@ class CustomerUserManager(UserManager):
         username = base_username
         counter = 1
 
-        # Ensure username is unique
         while User.objects.filter(username=username).exists():
             username = f"{base_username}{counter}"
             counter += 1
@@ -56,9 +52,8 @@ class CustomerUserManager(UserManager):
 
 
 class User(AbstractUser):
-    """
-    Custom user model extending Django's AbstractUser with UUID primary key.
-    """
+    """Custom user model extending Django's 
+    AbstractUser with UUID primary key."""
     objects = CustomerUserManager()
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -66,8 +61,9 @@ class User(AbstractUser):
     email_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    last_email_sent = models.DateTimeField(null=True, blank=True)
 
-    username = models.CharField(blank=True, null=True)
+    username = models.CharField(max_length=150, blank=True, null=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
@@ -99,3 +95,25 @@ class User(AbstractUser):
             self.username = CustomerUserManager.generate_unique_username(
                 self.email)
         super().save(*args, **kwargs)
+
+
+class EmailVerificationToken(models.Model):
+    """Model to track email verification tokens"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(hours=24)
+
+
+class PasswordResetToken(models.Model):
+    """Model to track password reset tokens"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(hours=1)
