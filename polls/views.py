@@ -1,5 +1,22 @@
 
 # polls/views.py
+from .filters import PollFilter
+from .permissions import (
+    # IsOwnerOrReadOnly,
+    CanVote,
+    CanEditPoll,
+    CanDeletePoll,
+    # IsAuthenticatedForWriteOperations,
+    CanViewOwnVotes,
+    VotesAreReadOnly
+)
+from .serializers import (
+    PollSerializer,
+    VoteSerializer,
+    PollResultsSerializer,
+    PollCreateSerializer,
+    UserVoteSerializer
+)
 from rest_framework import viewsets, status, mixins
 from rest_framework import filters as rest_filters
 from rest_framework.decorators import action
@@ -21,23 +38,10 @@ from asgiref.sync import async_to_sync
 
 from .models import Poll, Vote
 
-from .serializers import (
-    PollSerializer,
-    VoteSerializer,
-    PollResultsSerializer,
-    PollCreateSerializer,
-    UserVoteSerializer
-)
-from .permissions import (
-    # IsOwnerOrReadOnly,
-    CanVote,
-    CanEditPoll,
-    CanDeletePoll,
-    # IsAuthenticatedForWriteOperations,
-    CanViewOwnVotes,
-    VotesAreReadOnly
-)
-from .filters import PollFilter
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @method_decorator(name='destroy', decorator=swagger_auto_schema(
@@ -74,6 +78,7 @@ class PollViewSet(viewsets.ModelViewSet):
             return PollCreateSerializer
         elif self.action == 'results':
             return PollResultsSerializer
+        logger.warn("using default poll serializer")
         return PollSerializer
 
     def get_permissions(self):

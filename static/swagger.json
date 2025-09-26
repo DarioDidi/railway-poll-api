@@ -133,8 +133,8 @@
             "parameters": []
         },
         "/auth/password/change/": {
-            "post": {
-                "operationId": "auth_password_change_create",
+            "put": {
+                "operationId": "auth_password_change_update",
                 "summary": "Change password",
                 "description": "Change authenticated user's password. Requires current password for verification.",
                 "parameters": [
@@ -207,31 +207,6 @@
                 },
                 "tags": [
                     "password"
-                ]
-            },
-            "put": {
-                "operationId": "auth_password_change_update",
-                "description": "",
-                "parameters": [
-                    {
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/ChangePassword"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/ChangePassword"
-                        }
-                    }
-                },
-                "tags": [
-                    "auth"
                 ]
             },
             "patch": {
@@ -1053,6 +1028,12 @@
                         "type": "string"
                     },
                     {
+                        "name": "creator_email",
+                        "in": "query",
+                        "description": "Filter by creator_email (contains)",
+                        "type": "string"
+                    },
+                    {
                         "name": "status",
                         "in": "query",
                         "description": "Filter by status (active, upcoming, expired)",
@@ -1067,6 +1048,13 @@
                         "name": "created_after",
                         "in": "query",
                         "description": "Filter polls created after this date",
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    {
+                        "name": "created_before",
+                        "in": "query",
+                        "description": "Filter polls created before this date",
                         "type": "string",
                         "format": "date-time"
                     }

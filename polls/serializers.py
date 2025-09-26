@@ -5,6 +5,10 @@ from .models import Poll, Vote
 
 from polls.models import current_time, one_week_from_now
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class PollCreateSerializer(serializers.ModelSerializer):
     """
@@ -85,9 +89,11 @@ class PollSerializer(serializers.ModelSerializer):
     """
     owner_email = serializers.SerializerMethodField()
     creator_email = serializers.SerializerMethodField()
-    total_votes = serializers.IntegerField(read_only=True)
+    # total_votes = serializers.IntegerField(read_only=True)
+    total_votes = serializers.SerializerMethodField(read_only=True)
     has_user_voted = serializers.SerializerMethodField()
-    status = serializers.CharField(read_only=True)
+    # status = serializers.CharField(read_only=True)
+    status = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Poll
@@ -114,6 +120,18 @@ class PollSerializer(serializers.ModelSerializer):
         if request and request.user.is_authenticated:
             return obj.votes.filter(user=request.user).exists()
         return False
+
+    def get_total_votes(self, obj):
+        return Vote.objects.filter(poll=obj).count()
+
+    def get_status(self, obj):
+        now = timezone.now()
+        if obj.is_active:
+            return 'active'
+        elif obj.is_active and obj.start_date > now:
+            return 'upcoming'
+        elif obj.expiry_date < now:
+            return 'expired'
 
 
 class VoteSerializer(serializers.ModelSerializer):
