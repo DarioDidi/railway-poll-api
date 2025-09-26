@@ -106,6 +106,11 @@ class UserLoginSerializer(serializers.Serializer):
                 code='authorization'
             )
 
+        if not user.email_verified:
+            raise serializers.ValidationError(
+                _('Email not verified'),
+                code='authorization'
+            )
         if not user.is_active:
             raise serializers.ValidationError(
                 _('User account is disabled.'),

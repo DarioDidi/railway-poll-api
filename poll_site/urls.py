@@ -28,21 +28,24 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # Override the default email confirmation URL
-    path('api/auth/registration/account-confirm-email/<str:key>/',
-         APIConfirmEmailView.as_view(),
-         name='account_confirm_email'),
+    # path('api/auth/registration/account-confirm-email/<str:key>/',
+    #     APIConfirmEmailView.as_view(),
+    #     name='account_confirm_email'),
     # override token views
-    path('api/auth/token/verify/', TokenVerifyView.as_view(),
-         name='rest_token_verify'),
-    path('api/auth/token/refresh/', get_refresh_view().as_view(),
-         name='rest_token_refresh'),
+    # path('api/auth/token/verify/', TokenVerifyView.as_view(),
+    #     name='rest_token_verify'),
+    # path('api/auth/token/refresh/', get_refresh_view().as_view(),
+    #     name='rest_token_refresh'),
 
     # Dj-rest-auth endpoints
-    path('api/auth/', include('dj_rest_auth.urls')),
+    # path('api/auth/', include('dj_rest_auth.urls')),
 
-    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
-    path('auth/', include('django.contrib.auth.urls')),
+    # path('api/auth/registration/',
+    # include('dj_rest_auth.registration.urls')),
+    # path('auth/', include('django.contrib.auth.urls')),
 
+    # custom auth
+    path('api/', include('users.urls')),
     # polls
     path('api/', include('polls.urls')),
 

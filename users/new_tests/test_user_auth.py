@@ -1,12 +1,12 @@
 # users/tests/test_auth_endpoints.py
-from django.conf import settings
-import pytest
-from rest_framework import status
-from django.urls import reverse
-from unittest.mock import patch, MagicMock
-from django.core import mail
-from rest_framework.test import APIClient
 from django.contrib.auth import get_user_model
+from rest_framework.test import APIClient
+from django.core import mail
+from unittest.mock import patch, MagicMock
+from django.urls import reverse
+from rest_framework import status
+import pytest
+from django.conf import settings
 
 User = get_user_model()
 
@@ -94,6 +94,7 @@ class TestAuthEndpoints:
         if hasattr(authenticated_client, 'session'):
             print(f"Session keys: {list(authenticated_client.session.keys())}")
 
+        print(f"response data: {response.data}")
         assert response.status_code == status.HTTP_200_OK
 
     def test_user_detail_retrieve(self, authenticated_client, user):

@@ -1,5 +1,7 @@
 import os
 import warnings
+import dj_database_url
+
 from pathlib import Path
 from django.utils.timezone import timedelta
 from dotenv import load_dotenv
@@ -8,13 +10,16 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+API_BASE_URL = os.environ.get('API_BASE_URL', default='http://localhost:8000')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY =\
-    'django-insecure-sqy5x^s+w_)z%qav(h$0y@f!e1@vf1&q&j708j_))!+da@wd9-'
+# SECRET_KEY =\
+#    'django-insecure-sqy5x^s+w_)z%qav(h$0y@f!e1@vf1&q&j708j_))!+da@wd9-'
+
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -57,7 +62,7 @@ INSTALLED_APPS = [
 
     # custom apps
     'users',
-    'polls'
+    'polls',
 ]
 
 MIDDLEWARE = [
@@ -85,7 +90,8 @@ ROOT_URLCONF = 'poll_site.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        # 'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -126,6 +132,14 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#    'default': dj_database_url.config(
+#        # Replace this value with your local database's connection string.
+#        default='postgresql://postgres:postgres@localhost:5432/mysite',
+#        conn_max_age=600
+#    )
+# }
 
 
 # Password validation
@@ -319,4 +333,20 @@ LOGGING = {
         "handlers": ["console"],
         "level": "WARNING",
     },
+}
+
+# Celery configuration
+CELERY_BROKER_URL = os.environ.get(
+    'CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.environ.get(
+    'CELERY_BROKER_URL', 'redis://localhost:6379/0')
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': os.environ.get('REDIS_URL', 'redis://localhost:6379/0'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
 }
