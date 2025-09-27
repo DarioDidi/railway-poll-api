@@ -24,6 +24,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 
@@ -339,7 +340,8 @@ def export_results(self, request, pk=None):
         from django.http import HttpResponse
 
         response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = f'attachment; filename="poll_{poll.id}_results.csv"'
+        response['Content-Disposition'] = (
+            f'attachment; filename="poll_{poll.id}_results.csv"')
 
         writer = csv.writer(response)
         writer.writerow(['Option', 'Votes', 'Percentage'])
@@ -369,3 +371,7 @@ def export_results(self, request, pk=None):
             {'error': 'Unsupported format. Use "json" or "csv".'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+
+def health_check(request):
+    return JsonResponse({"status": "healthy", "service": "polls-api"})
