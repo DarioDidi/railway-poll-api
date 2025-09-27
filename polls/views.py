@@ -1,5 +1,6 @@
 
 # polls/views.py
+from django.views.decorators.http import require_GET
 from .filters import PollFilter
 from .permissions import (
     # IsOwnerOrReadOnly,
@@ -373,5 +374,14 @@ def export_results(self, request, pk=None):
         )
 
 
+@require_GET
 def health_check(request):
-    return JsonResponse({"status": "healthy", "service": "polls-api"})
+    """
+    Simple health check endpoint for Render.com monitoring
+    Returns 200 if application is healthy
+    """
+    return JsonResponse({
+        "status": "healthy",
+        "service": "polls-api",
+        "timestamp": timezone.now().isoformat()
+    })
