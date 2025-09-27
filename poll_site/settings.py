@@ -10,7 +10,6 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 API_BASE_URL = os.environ.get('API_BASE_URL', default='http://localhost:8000')
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -23,6 +22,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['.localhost',
                  '.onrender.com']
+
+# ALLOWED_HOSTS = ['*']
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
@@ -43,16 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # allauth
-    # 'django.contrib.sites',
-    # 'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
-
-    # rest auth
     'rest_framework_simplejwt',
-    # 'dj_rest_auth',
-    # 'dj_rest_auth.registration',
 
     'rest_framework',
     'rest_framework.authtoken',
@@ -69,6 +61,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
 
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,10 +73,7 @@ MIDDLEWARE = [
     'utils.middleware.BlockedIPMiddleware',
     'utils.middleware.SuspiciousRequestMiddleware',
 
-    # allauth middleware
-    # 'allauth.account.middleware.AccountMiddleware',
     # serve these static assets from Render's web server.
-    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
 ROOT_URLCONF = 'poll_site.urls'
@@ -99,9 +89,6 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-
-                # `allauth` needs this from django
-                # 'django.template.context_processors.request',
             ],
         },
     },
@@ -111,19 +98,22 @@ WSGI_APPLICATION = 'poll_site.wsgi.application'
 
 # Channel layers (using Redis as backend)
 ASGI_APPLICATION = 'poll_site.asgi.application'
+
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],  # Adjust for your Redis server
-        },
+        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        # 'CONFIG': {
+        #    "hosts": REDIS_URL
+        # },
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
 
-if not DEBUG:
-    CHANNEL_LAYERS['default']['CONFIG']['hosts'] = [
-        (os.environ.get('REDIS_URL', 'redis://localhost:6379'))
-    ]
+# if not DEBUG:
+#    CHANNEL_LAYERS['default']['CONFIG']['hosts'] = [
+#        (os.environ.get('REDIS_URL', 'redis://localhost:6379'))
+#    ]
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
@@ -198,22 +188,17 @@ if not DEBUG:
     STATICFILES_STORAGE = \
         'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+    # STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# Required for allauth
-# SITE_ID = 1
-
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        # 'rest_framework.authentication.TokenAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticatedOrReadOnly',
@@ -240,10 +225,7 @@ REST_FRAMEWORK = {
 }
 
 AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
-    # `allauth` specific authentication methods, such as login by email
-    # 'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 # JWT settings
@@ -259,25 +241,6 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,
 }
 
-# Django Allauth Settings
-# ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-# ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-# ACCOUNT_LOGIN_METHODS = ["email"]
-# ACCOUNT_USERNAME_REQUIRED = False
-#
-#
-# ACCOUNT_SIGNUP_FIELDS = ['email*',  'password1*', 'password2*']
-#
-# To avoid Rendering email confirmation template
-# ACCOUNT_EMAIL_CONFIRMATION_ANONYMOUS_REDIRECT_URL = '/api/auth/verified/'
-# ACCOUNT_EMAIL_CONFIRMATION_AUTHENTICATED_REDIRECT_URL = '/api/auth/verified/'
-#
-# Disable allauth templates
-# This will automatically confirm email on link click
-# ACCOUNT_CONFIRM_EMAIL_ON_GET set to True
-# the user will confirm the e-mail just by clicking the link
-# ACCOUNT_CONFIRM_EMAIL_ON_GET = True
-# CONFIRM_EMAIL_ON_GET = True
 
 # Email backend for development
 if DEBUG:
@@ -285,6 +248,7 @@ if DEBUG:
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_TIMEOUT = 30
+
 # Email configuration
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
@@ -294,35 +258,14 @@ EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
 
-# Dj-rest-auth settings
-# REST_AUTH = {
-#    'USE_JWT': True,
-#    # Make sure this is False to get refresh token in response
-#    # WARNING: CHANGE IN PRODUCTION!!!!
-#
-#    # 'JWT_AUTH_HTTPONLY': False,
-#    'JWT_AUTH_COOKIE': 'polls-auth',
-#    'JWT_AUTH_REFRESH_COOKIE': 'polls-refresh-token',
-#    'JWT_AUTH_REFRESH_COOKIE_PATH': '/',
-#    'JWT_AUTH_SAMESITE': 'Lax',
-#    'REGISTER_SERIALIZER': 'users.serializers.CustomRegisterSerializer',
-#
-#    # Disable template rendering for email verification
-#    'EMAIL_VERIFICATION_SENT_WHEN_REGISTERING': False,
-# }
 
-# To completely suppress the warnings
-# warnings.filterwarnings("ignore",
-#                        message="app_settings.USERNAME_REQUIRED is deprecated")
-# warnings.filterwarnings("ignore",
-#                        message="app_settings.EMAIL_REQUIRED is deprecated")
-
+# swagger
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": 'poll_site.urls.api_info'
 }
 SWAGGER_USE_COMPAT_RENDERERS = False
 
-
+# logging
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -352,3 +295,27 @@ CACHES = {
         }
     }
 }
+
+# Required Django Settings for Railway
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.environ['PGDATABASE'],
+#        'USER': os.environ['PGUSER'],
+#        'PASSWORD': os.environ['PGPASSWORD'],
+#        'HOST': os.environ['PGHOST'],
+#        'PORT': os.environ['PGPORT'],
+#    }
+# }
+#
+# Redis for Channels
+# REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
+#
+# CHANNEL_LAYERS = {
+#    "default": {
+#        "BACKEND": "channels_redis.core.RedisChannelLayer",
+#        "CONFIG": {
+#            "hosts": [REDIS_URL],
+#        },
+#    },
+# }

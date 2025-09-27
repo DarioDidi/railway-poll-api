@@ -17,6 +17,8 @@ services:
         value: "False"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
+      - key: API_BASE_URL
+        value:"https://polls-api-ti3c.onrender.com"
       - key: REDIS_URL
         fromService:
           name: polls-redis
