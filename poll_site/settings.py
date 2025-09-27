@@ -252,26 +252,31 @@ CACHES = {
     }
 }
 
-# Required Django Settings for Railway
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql',
-#        'NAME': os.environ['PGDATABASE'],
-#        'USER': os.environ['PGUSER'],
-#        'PASSWORD': os.environ['PGPASSWORD'],
-#        'HOST': os.environ['PGHOST'],
-#        'PORT': os.environ['PGPORT'],
-#    }
-# }
 
+os.environ.setdefault("PGDATABASE", "polls-db")
+os.environ.setdefault("PGUSER", "user")
+os.environ.setdefault("PGPASSWORD", "")
+os.environ.setdefault("PGHOST", "localhost")
+os.environ.setdefault("PGPORT", "5432")
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ["PGDATABASE"],
+        'USER': os.environ["PGUSER"],
+        'PASSWORD': os.environ["PGPASSWORD"],
+        'HOST': os.environ["PGHOST"],
+        'PORT': os.environ["PGPORT"],
+    }
 }
+
+# DATABASES = {
+#    'default': dj_database_url.config(
+#        default=os.environ.get('DATABASE_URL'),
+#        conn_max_age=600,
+#        ssl_require=True
+#    )
+# }
 # Redis for Channels
 
 CHANNEL_LAYERS = {
