@@ -1,5 +1,6 @@
+# Railway deployment settings
 import os
-# import dj_database_url
+import dj_database_url
 
 from pathlib import Path
 from django.utils.timezone import timedelta
@@ -11,23 +12,22 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 API_BASE_URL = os.environ.get('API_BASE_URL', default='http://localhost:8000')
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-
 DEBUG = False
 
-ALLOWED_HOSTS = ['.localhost',
-                 '.onrender.com']
+# ALLOWED_HOSTS = ['.localhost',
+#                 '.onrender.com']
 
-# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
-CSRF_COOKIE_SECURE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
-
+CSRF_COOKIE_SECURE = True
 
 AUTH_USER_MODEL = "users.User"
 
@@ -72,8 +72,6 @@ MIDDLEWARE = [
     # Custom middleware for IP blocking and monitoring
     'utils.middleware.BlockedIPMiddleware',
     'utils.middleware.SuspiciousRequestMiddleware',
-
-    # serve these static assets from Render's web server.
 ]
 
 ROOT_URLCONF = 'poll_site.urls'
@@ -99,37 +97,14 @@ WSGI_APPLICATION = 'poll_site.wsgi.application'
 # Channel layers (using Redis as backend)
 ASGI_APPLICATION = 'poll_site.asgi.application'
 
-REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
-CHANNEL_LAYERS = {
-    'default': {
-        # 'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        # 'CONFIG': {
-        #    "hosts": REDIS_URL
-        # },
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
-    },
-}
-
-# if not DEBUG:
-#    CHANNEL_LAYERS['default']['CONFIG']['hosts'] = [
-#        (os.environ.get('REDIS_URL', 'redis://localhost:6379'))
-#    ]
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
-#    'default': dj_database_url.config(
-#        # Replace this value with your local database's connection string.
-#        default='postgresql://postgres:postgres@localhost:5432/mysite',
-#        conn_max_age=600
-#    )
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
+#    }
 # }
 
 
@@ -169,26 +144,11 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
+# Railway settings
+STATIC_URL = 'static/'
 
-# STATIC_URL = 'static/'
-STATIC_URL = '/static/'
-
-# This production code might break development mode,
-# so we check whether we're in DEBUG mode
-if not DEBUG:
-    # Tell Django to copy static assets into a path called `staticfiles`
-    # (this is specific to Render)
-    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-    # Enable the WhiteNoise storage backend,
-    # which compresses static files to reduce disk use
-    # and renames the files with unique names
-    # for each version to support long-term caching
-    STATICFILES_STORAGE = \
-        'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-    # STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -243,12 +203,8 @@ SIMPLE_JWT = {
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# Email backend for development
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_TIMEOUT = 30
 
 # Email configuration
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -281,10 +237,10 @@ LOGGING = {
 }
 
 # Celery configuration
-CELERY_BROKER_URL = os.environ.get(
-    'CELERY_BROKER_URL', 'redis://localhost:6379/0')
-CELERY_RESULT_BACKEND = os.environ.get(
-    'CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = REDIS_URL
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
 
 CACHES = {
     'default': {
@@ -307,15 +263,22 @@ CACHES = {
 #        'PORT': os.environ['PGPORT'],
 #    }
 # }
-#
+
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ.get('DATABASE_URL'),
+        conn_max_age=600,
+        ssl_require=True
+    )
+}
 # Redis for Channels
-# REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379')
-#
-# CHANNEL_LAYERS = {
-#    "default": {
-#        "BACKEND": "channels_redis.core.RedisChannelLayer",
-#        "CONFIG": {
-#            "hosts": [REDIS_URL],
-#        },
-#    },
-# }
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [REDIS_URL],
+        },
+    },
+}

@@ -1,0 +1,52 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python manage.py migrate --noinput && daphne poll_site.asgi:application --bind 0.0.0.0 --port $PORT"
+healthCheckPath = "/api/health/"
+healthCheckTimeout = 300
+
+[[services]]
+name = "polls-api"
+type = "web"
+
+[services.env]
+SECRET_KEY = { generate = true }
+DEBUG = "False"
+ALLOWED_HOSTS = ".railway.app"
+DJANGO_SETTINGS_MODULE = "poll_site.settings"
+
+# Email configuration
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = "587"
+EMAIL_USE_TLS = "True"
+DEFAULT_FROM_EMAIL = "your-app@gmail.com"
+
+[[services]]
+name = "channels-worker"
+type = "worker"
+command = "python manage.py runworker"
+
+[services.env]
+SECRET_KEY = { generate = true }
+DEBUG = "False"
+ALLOWED_HOSTS = ".railway.app"
+DJANGO_SETTINGS_MODULE = "poll_site.settings"
+API_BASE_URL = "https://polls-api-production-439d.up.railway.app"
+
+[[services]]
+name = "celery-worker"
+type = "worker"
+command = "celery -A poll_site worker --loglevel=info"
+
+[services.env]
+SECRET_KEY = { generate = true }
+DEBUG = "False"
+
+[[services]]
+name = "polls-redis"
+type = "redis"
+plan = "ephemeral"
+
+# PostgreSQL is automatically provisioned by Railway

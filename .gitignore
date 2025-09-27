@@ -96,3 +96,6 @@ todo*/
 prompts.txt
 test_data.txt
 deploy_instrs.txt
+asks.txt
+
+certs/
