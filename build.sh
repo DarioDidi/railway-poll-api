@@ -15,4 +15,7 @@ python manage.py collectstatic --noinput --clear
 echo "Building documentation..."
 python manage.py generate_swagger -o static/swagger.json
 
+echo "Running tests"
+pytest -v
+
 echo "Build completed successfully!"

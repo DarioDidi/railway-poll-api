@@ -385,3 +385,14 @@ def health_check(request):
         "service": "polls-api",
         "timestamp": timezone.now().isoformat()
     })
+
+
+def root_view(request):
+    return JsonResponse({
+        'message': 'Polls API',
+        'endpoints': {
+            'health': '/api/health/',
+            'polls': '/api/polls/',
+            'auth': '/api/auth/'
+        }
+    })
