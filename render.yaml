@@ -9,7 +9,7 @@ services:
       python manage.py collectstatic --noinput
     startCommand: |
       python manage.py migrate --noinput
-      daphne polls_site.asgi:application --bind 0.0.0.0 --port $PORT
+      daphne poll_site.asgi:application --bind 0.0.0.0 --port $PORT
     envVars:
       - key: SECRET_KEY
         value: "Mc_tjdGp1Fo9_OygCBgjK8A5QhocSxPy8C4RYY2-5-9cx2pt4C9bOuHAZWHpGG3rvfc"
