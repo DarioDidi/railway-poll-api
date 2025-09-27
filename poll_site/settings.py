@@ -24,6 +24,10 @@ DEBUG = False
 ALLOWED_HOSTS = ['.localhost',
                  '.onrender.com']
 
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+
 AUTH_USER_MODEL = "users.User"
 
 # Application definition

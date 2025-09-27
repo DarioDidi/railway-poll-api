@@ -78,7 +78,6 @@ class PollViewSet(viewsets.ModelViewSet):
             return PollCreateSerializer
         elif self.action == 'results':
             return PollResultsSerializer
-        logger.warn("using default poll serializer")
         return PollSerializer
 
     def get_permissions(self):
