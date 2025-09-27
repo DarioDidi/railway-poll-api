@@ -6,6 +6,7 @@ from rest_framework import permissions
 
 from django.urls import path, include, re_path
 from django.contrib import admin
+from drf_yasg.generators import OpenAPISchemaGenerator
 
 # from users.views import APIConfirmEmailView
 # from users.views import SimpleConfirmEmailView
@@ -19,10 +20,20 @@ api_info = openapi.Info(
     description="API for creating polls, voting, and fetching results",
     license=openapi.License(name="BSD License"),
 )
+
+
+class BothHttpAndHttpsSchemaGenerator(OpenAPISchemaGenerator):
+    def get_schema(self, request=None, public=False):
+        schema = super().get_schema(request, public)
+        schema.schemes = ["http", "https"]
+        return schema
+
+
 schema_view = get_schema_view(
     public=True,
     permission_classes=(permissions.AllowAny,),
 )
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),

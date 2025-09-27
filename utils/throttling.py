@@ -45,7 +45,6 @@ class SuspiciousRequestThrottle(SimpleRateThrottle):
         if self.key is None:
             return True
 
-        print("\n\n\n\nTHROTTLING:\n\n\n")
         self.history = self.cache.get(self.key, [])
         self.now = self.timer()
 
