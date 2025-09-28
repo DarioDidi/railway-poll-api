@@ -202,18 +202,27 @@ SIMPLE_JWT = {
 }
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-if DEBUG:
-    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# if DEBUG:
+#    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#
 # Email configuration
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+# EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+# EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
+# EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() == 'true'
+# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+# EMAIL_HOST_PASSWORD = os.environ.get('RESEND_API_KEY')
+# DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+# MAILGUN, anymail settings
+# ANYMAIL = {
+#    "MAILGUN_API_KEY": os.environ.get("MAILGUN_API_KEY"),
+#    "MAILGUN_SENDER_DOMAIN": 'mg.yourdomain.com',  # Your Mailgun domain
+# }
+# EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
+# DEFAULT_FROM_EMAIL = "sandbox89e3e855fd374841b4e786eadeea337d.mailgun.org"
 
 # swagger
 SWAGGER_SETTINGS = {
@@ -255,7 +264,7 @@ CACHES = {
 
 os.environ.setdefault("PGDATABASE", "polls-db")
 os.environ.setdefault("PGUSER", "user")
-os.environ.setdefault("PGPASSWORD", "")
+os.environ.setdefault("PGPASSWORD", "password")
 os.environ.setdefault("PGHOST", "localhost")
 os.environ.setdefault("PGPORT", "5432")
 

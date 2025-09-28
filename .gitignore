@@ -97,5 +97,6 @@ prompts.txt
 test_data.txt
 deploy_instrs.txt
 asks.txt
+email_testing*
 
 certs/

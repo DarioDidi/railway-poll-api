@@ -42,7 +42,7 @@ class TestBlockedIPMiddleware:
         """Test that inactive blocks don't affect requests"""
         # Create an inactive block
         BlockedIP.objects.create(
-            ip_address='192.168.1.300',
+            ip_address='192.168.1.100',
             reason='Inactive test',
             is_active=False
         )
@@ -53,7 +53,7 @@ class TestBlockedIPMiddleware:
 
         # Create request from "blocked" but inactive IP
         request = factory.get('/api/polls/')
-        request.META['REMOTE_ADDR'] = '192.168.1.300'
+        request.META['REMOTE_ADDR'] = '192.168.1.100'
 
         response = middleware.process_request(request)
         # Should allow through since block is inactive

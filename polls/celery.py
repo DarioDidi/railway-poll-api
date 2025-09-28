@@ -12,10 +12,10 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 # Periodic tasks
 app.conf.beat_schedule = {
-    'send-poll-results-emails': {
-        'task': 'polls.tasks.send_poll_results_emails',
-        'schedule': 3600.0,  # Run every hour
-    },
+    # 'send-poll-results-emails': {
+    #    'task': 'polls.tasks.send_poll_results_emails',
+    #    'schedule': 3600.0,  # Run every hour
+    # },
     'check-database-connection': {
         'task': 'polls.tasks.check_database_connection',
         'schedule': 300.0,  # Run every 5 minutes

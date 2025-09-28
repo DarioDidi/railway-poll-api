@@ -21,7 +21,6 @@ class TestUserModel:
         assert user.is_active is True
         assert user.is_staff is False
         assert user.is_superuser is False
-        assert user.email_verified is False
 
     def test_create_superuser(self):
         """Test creating a superuser"""
@@ -73,13 +72,3 @@ class TestUserModel:
                 email=None,
                 password='testpass123'
             )
-
-    def test_create_user_with_extra_fields(self):
-        """Test creating user with additional fields"""
-        user = User.objects.create_user(
-            email='test@example.com',
-            password='testpass123',
-            email_verified=True
-        )
-
-        assert user.email_verified is True

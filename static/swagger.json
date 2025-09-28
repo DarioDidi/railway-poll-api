@@ -339,7 +339,7 @@
             "post": {
                 "operationId": "auth_registration_create",
                 "summary": "Register new user",
-                "description": "Creates a new user accountand sends email verification.Username is auto-generated from email.",
+                "description": "Creates a new user accountUsername is auto-generated from email.",
                 "parameters": [
                     {
                         "name": "data",
@@ -388,7 +388,7 @@
                         },
                         "examples": {
                             "application/json": {
-                                "detail": "User registered successfully.Please check your email for verification.",
+                                "detail": "User registered successfully.",
                                 "user_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
                             }
                         }
@@ -413,107 +413,6 @@
                 ]
             },
             "parameters": []
-        },
-        "/auth/registration/verify-email/": {
-            "post": {
-                "operationId": "auth_registration_verify-email_create",
-                "summary": "Request email verification",
-                "description": "Request new email verification email to be sent. Rate limited to prevent spam.",
-                "parameters": [
-                    {
-                        "name": "data",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "required": [
-                                "email"
-                            ],
-                            "type": "object",
-                            "properties": {
-                                "email": {
-                                    "type": "string",
-                                    "format": "email"
-                                }
-                            }
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Verification email sent",
-                        "examples": {
-                            "application/json": {
-                                "detail": "Verification email sent."
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Email already verified or not found",
-                        "examples": {
-                            "application/json": {
-                                "detail": "Email is already verified."
-                            }
-                        }
-                    },
-                    "429": {
-                        "description": "Too many requests",
-                        "examples": {
-                            "application/json": {
-                                "detail": "Please wait before requesting another verification email."
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "verification"
-                ]
-            },
-            "parameters": []
-        },
-        "/auth/registration/verify-email/{token}/": {
-            "get": {
-                "operationId": "auth_registration_verify-email_read",
-                "summary": "Verify email address",
-                "description": "Verify email address using token from verification email (GET endpoint for email links).",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "path",
-                        "description": "Verification token from email",
-                        "type": "string",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Email verified successfully",
-                        "examples": {
-                            "application/json": {
-                                "detail": "Email verified successfully."
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid or expired token",
-                        "examples": {
-                            "application/json": {
-                                "detail": "Invalid or expired verification token."
-                            }
-                        }
-                    }
-                },
-                "tags": [
-                    "verification"
-                ]
-            },
-            "parameters": [
-                {
-                    "name": "token",
-                    "in": "path",
-                    "required": true,
-                    "type": "string"
-                }
-            ]
         },
         "/auth/token/refresh/": {
             "post": {
@@ -644,9 +543,6 @@
                                     "type": "string",
                                     "format": "email"
                                 },
-                                "email_verified": {
-                                    "type": "boolean"
-                                },
                                 "date_joined": {
                                     "type": "string",
                                     "format": "date-time"
@@ -710,9 +606,6 @@
                                 "email": {
                                     "type": "string",
                                     "format": "email"
-                                },
-                                "email_verified": {
-                                    "type": "boolean"
                                 },
                                 "date_joined": {
                                     "type": "string",
@@ -791,9 +684,6 @@
                                 "email": {
                                     "type": "string",
                                     "format": "email"
-                                },
-                                "email_verified": {
-                                    "type": "boolean"
                                 },
                                 "date_joined": {
                                     "type": "string",

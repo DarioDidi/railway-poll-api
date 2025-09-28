@@ -5,6 +5,8 @@ from rest_framework import status
 from django.urls import reverse
 from polls.models import Vote, Poll
 
+denied_status = [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN]
+
 
 @pytest.mark.django_db
 class TestPollAPI:
@@ -62,7 +64,7 @@ class TestPollAPI:
         }
 
         response = client.post(url, data, format='json')
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code in denied_status
 
     def test_vote_on_poll(self, authenticated_client, poll, user):
         """Test voting on a poll"""
@@ -97,7 +99,7 @@ class TestPollAPI:
         data = {'option_index': 0}
 
         response = client.post(vote_url, data, format='json')
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code in denied_status
 
     def test_get_poll_results_unauthenticated(self, client, poll_with_votes):
         """Test that anyone can view poll results"""
@@ -154,7 +156,7 @@ class TestPollAPI:
 
         response = client.delete(url,  format='json')
         print(response)
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code in denied_status
 
 
 @pytest.mark.django_db

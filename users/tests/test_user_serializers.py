@@ -19,8 +19,6 @@ class TestUserRegistrationSerializer:
     def test_valid_registration_data(self, db):
         data = {
             'email': 'test@example.com',
-            'first_name': 'John',
-            'last_name': 'Doe',
             'password': 'securepassword123',
             'password_confirm': 'securepassword123'
         }
@@ -93,7 +91,7 @@ class TestUserLoginSerializer:
         user = create_user(
             email='test@example.com',
             password='testpass123',
-            email_verified=True,
+            # email_verified=True,
             is_active=True
         )
         user.set_password('testpass123')
@@ -118,30 +116,29 @@ class TestUserLoginSerializer:
         assert not serializer.is_valid()
         assert 'non_field_errors' in serializer.errors
 
-    def test_unverified_email(self, create_user, rf):
-        user = create_user(
-            email='test@example.com',
-            password='testpass123',
-            email_verified=False,
-            is_active=True
-        )
-        user.set_password('testpass123')
-        user.save()
+    # def test_unverified_email(self, create_user, rf):
+    #    user = create_user(
+    #        email='test@example.com',
+    #        password='testpass123',
+    #        # email_verified=False,
+    #        is_active=True
+    #    )
+    #    user.set_password('testpass123')
+    #    user.save()
 
-        request = rf.post('/login/')
-        serializer = UserLoginSerializer(
-            data={'email': 'test@example.com', 'password': 'testpass123'},
-            context={'request': request}
-        )
+    #    request = rf.post('/login/')
+    #    serializer = UserLoginSerializer(
+    #        data={'email': 'test@example.com', 'password': 'testpass123'},
+    #        context={'request': request}
+    #    )
 
-        assert not serializer.is_valid()
-        assert 'non_field_errors' in serializer.errors
+    #    assert not serializer.is_valid()
+    #    assert 'non_field_errors' in serializer.errors
 
     def test_inactive_user(self, create_user, rf):
         user = create_user(
             email='test@example.com',
             password='testpass123',
-            email_verified=True,
             is_active=False
         )
         user.set_password('testpass123')

@@ -22,15 +22,6 @@ def verified_user():
         password='testpass123',
     )
 
-    # Verify the email using allauth's EmailAddress model
-    from allauth.account.models import EmailAddress
-    EmailAddress.objects.create(
-        user=user,
-        email=user.email,
-        verified=True,
-        primary=True
-    )
-
     return user
 
 
@@ -40,7 +31,7 @@ def unverified_user():
     user = User.objects.create_user(
         email='unverified@example.com',
         password='testpass123',
-        email_verified=False
+        # email_verified=False
     )
     return user
 

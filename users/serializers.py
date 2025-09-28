@@ -105,11 +105,12 @@ class UserLoginSerializer(serializers.Serializer):
                 code='authorization'
             )
 
-        if not user.email_verified:
-            raise serializers.ValidationError(
-                _('Email not verified'),
-                code='authorization'
-            )
+        # if not user.email_verified:
+        #    raise serializers.ValidationError(
+        #        _('Email not verified'),
+        #        code='authorization'
+        #    )
+
         if not user.is_active:
             raise serializers.ValidationError(
                 _('User account is disabled.'),
@@ -127,7 +128,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             'id', 'email', 'first_name', 'last_name', 'full_name',
-            'email_verified', 'date_joined', 'created_at', 'updated_at'
+            'date_joined', 'created_at', 'updated_at'
         )
         read_only_fields = ('id', 'email', 'created_at',
                             'updated_at', 'email_verified')
@@ -189,17 +190,20 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             if not user.is_active:
                 raise serializers.ValidationError(
                     _("User account is disabled."))
+            return value.lower()
         except User.DoesNotExist:
-            # Don't reveal whether email exists
-            pass
+            raise serializers.ValidationError(
+                _("No user found with this email address."))
         return value.lower()
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
-    token = serializers.CharField(required=True)
+    # token = serializers.CharField(required=True)
     new_password = serializers.CharField(write_only=True, required=True)
     new_password_confirm = serializers.CharField(
         write_only=True, required=True)
+    reset_code = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
 
     def validate_new_password(self, value):
         try:

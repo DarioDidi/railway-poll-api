@@ -49,4 +49,3 @@ name = "polls-redis"
 type = "redis"
 plan = "ephemeral"
 
-# PostgreSQL is automatically provisioned by Railway

@@ -22,22 +22,20 @@ A comprehensive poll management system built with Django REST Framework, Postgre
 - **Documentation**: drf-yasg for Swagger
 - **Deployment**: Render.com with Docker-based deployment
 - **Testing**: Pytest with comprehensive test coverage
+- **Search**: Robust searching with advance django filters
 
 ## AUTH endpoints:
 
-| Endpoint | Method | Description |
+| Method | Endpoint | Description |
 |--------|----------|-------------|
-|/api/auth/login/|	POST|	User login|
-|/api/auth/logout/|	POST|	User logout|
-|/api/auth/password/reset/|	POST|	Password reset request|
-|/api/auth/password/reset/confirm/|	POST|	Password reset confirmation|
-|/api/auth/password/change/|	POST|	Password change|
-|/api/auth/user/|	GET, PUT, PATCH|	User details|
-|/api/auth/token/verify/|	POST|	Token verification|
-|/api/auth/token/refresh/|	POST|	Token refresh (JWT)|
-|/api/auth/registration/|	POST|	User registration|
-|/api/auth/registration/verify-email/|	POST|	Email verification|
-
+POST | /api/auth/registration/          | Register (no email verification)
+POST | /api/auth/login/                 | Login (no email check)
+POST | /api/auth/password/reset/        | Get reset code (returns code in response)
+POST | /api/auth/password/reset/confirm/| Reset with code + new password
+POST | /api/auth/password/change/       | Change password (authenticated)
+GET/PUT/PATCH |/api/auth/user/         | Profile management
+POST | /api/auth/token/verify/          | Token verification
+POST | /api/auth/token/refresh/         | Token refresh
 ## Model Endpoints
 
 | Method | Endpoint | Description | Authentication |

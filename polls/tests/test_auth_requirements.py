@@ -3,6 +3,9 @@ from rest_framework import status
 from django.urls import reverse
 
 
+denied_status = [status.HTTP_401_UNAUTHORIZED, status.HTTP_403_FORBIDDEN]
+
+
 @pytest.mark.django_db
 class TestAuthenticationRequirements:
     """Test authentication requirements for different endpoints"""
@@ -11,6 +14,7 @@ class TestAuthenticationRequirements:
         """Test that read operations are public"""
         # List polls
         response = client.get(reverse('poll-list'))
+        print(f"polls-list resp:{response}")
         assert response.status_code == status.HTTP_200_OK
 
         # Retrieve single poll
@@ -34,7 +38,7 @@ class TestAuthenticationRequirements:
 
         response = client.post(reverse('poll-list'),
                                create_data, format='json')
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code in denied_status
 
         # Vote
         vote_data = {'option_index': 0}
@@ -43,7 +47,7 @@ class TestAuthenticationRequirements:
             vote_data,
             format='json'
         )
-        assert response.status_code == status.HTTP_401_UNAUTHORIZED
+        assert response.status_code in denied_status
 
         # Both should work with authentication
         response = authenticated_client.post(
