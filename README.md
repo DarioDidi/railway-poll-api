@@ -28,14 +28,14 @@ A comprehensive poll management system built with Django REST Framework, Postgre
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-POST | /api/auth/registration/          | Register (no email verification)
-POST | /api/auth/login/                 | Login (no email check)
-POST | /api/auth/password/reset/        | Get reset code (returns code in response)
-POST | /api/auth/password/reset/confirm/| Reset with code + new password
-POST | /api/auth/password/change/       | Change password (authenticated)
-GET/PUT/PATCH |/api/auth/user/         | Profile management
-POST | /api/auth/token/verify/          | Token verification
-POST | /api/auth/token/refresh/         | Token refresh
+POST | /api/auth/registration/          | Register(with email) |
+POST | /api/auth/login/                 | Login (email + password) |
+POST | /api/auth/password/reset/        | Get reset code (returns code in response) |
+POST | /api/auth/password/reset/confirm/| Reset with code + new password |
+POST | /api/auth/password/change/       | Change password (authenticated) |
+GET/PUT/PATCH |/api/auth/user/         | Profile managementA |
+POST | /api/auth/token/verify/          | Token verification |
+POST | /api/auth/token/refresh/         | Token refresh |
 ## Model Endpoints
 
 | Method | Endpoint | Description | Authentication |

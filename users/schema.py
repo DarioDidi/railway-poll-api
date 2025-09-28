@@ -1,7 +1,5 @@
 # users/schema.py
 from drf_yasg import openapi
-# from drf_yasg.utils import swagger_auto_schema
-# from rest_framework import status
 
 # Common parameter definitions
 email_parameter = openapi.Parameter(
@@ -23,7 +21,6 @@ user_profile_response = openapi.Response(
                                  format=openapi.FORMAT_UUID),
             'email': openapi.Schema(type=openapi.TYPE_STRING,
                                     format=openapi.FORMAT_EMAIL),
-            # 'email_verified': openapi.Schema(type=openapi.TYPE_BOOLEAN),
             'date_joined': openapi.Schema(type=openapi.TYPE_STRING,
                                           format=openapi.FORMAT_DATETIME),
         }

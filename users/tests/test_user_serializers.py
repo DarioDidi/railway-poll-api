@@ -88,7 +88,6 @@ class TestUserLoginSerializer:
         user = create_user(
             email='test@example.com',
             password='testpass123',
-            # email_verified=True,
             is_active=True
         )
         user.set_password('testpass123')

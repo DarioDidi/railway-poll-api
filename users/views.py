@@ -15,11 +15,11 @@ from rest_framework import status, generics, permissions
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from .schema import (password_change_request_body, password_reset_confirm_body,
-                     password_reset_request_body, registration_request_body,
-                     error_response, login_request_body, auth_token_response,
-                     user_profile_response, token_verify_body,
-                     token_refresh_body)
+from .schema import (
+    registration_request_body, password_change_request_body,
+    error_response, login_request_body, auth_token_response,
+    user_profile_response, token_verify_body,
+    token_refresh_body)
 
 import logging
 
@@ -238,30 +238,37 @@ class ChangePasswordView(generics.UpdateAPIView):
         from django.contrib.auth import update_session_auth_hash
         update_session_auth_hash(request, user)
 
-        return Response({"detail": "Password updated successfully."})
+        # Logout user from current session
+        logout(request)
+        response_data = {
+            "detail": ("Password updated successfully."
+                       " Please login again with your new password."),
+            "logout_required": True
+        }
+
+        return Response(response_data)
 
 
 @swagger_auto_schema(
     method='post',
-    operation_summary="Request password reset",
-    operation_description=("Request password reset email."
-                           " Always returns success to"
-                           " prevent email enumeration."),
-    request_body=password_reset_request_body,
+    operation_summary="Request password reset code",
+    operation_description=(
+        "Generate a password reset code for the user."
+        " Returns the code directly."),
+    request_body=PasswordResetRequestSerializer,
     responses={
         status.HTTP_200_OK: openapi.Response(
-            description="Reset email sent if account exists",
+            description="Reset code generated",
             examples={
                 'application/json': {
-                    'detail': ('If the email exists,'
-                               ' a password reset link has been sent.')
+                    'reset_code': '123456',
+                    'email': 'user@example.com',
+                    'expires_in': 900
                 }
             }
         )
     },
     tags=['password']
-
-
 )
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -284,10 +291,10 @@ def password_reset_request(request):
 
 @swagger_auto_schema(
     method='post',
-    operation_summary="Confirm password reset",
-    operation_description=("Confirm password reset using"
-                           " token from email. Token expires in 1 hour."),
-    request_body=password_reset_confirm_body,
+    operation_summary="Confirm password reset with code",
+    operation_description=(
+        "Reset password using the code received from the reset request."),
+    request_body=PasswordResetConfirmSerializer,
     responses={
         status.HTTP_200_OK: openapi.Response(
             description="Password reset successful",
@@ -298,10 +305,10 @@ def password_reset_request(request):
             }
         ),
         status.HTTP_400_BAD_REQUEST: openapi.Response(
-            description="Invalid or expired token",
+            description="Invalid code or validation error",
             examples={
                 'application/json': {
-                    'detail': 'Invalid or expired token.'
+                    'detail': 'Invalid or expired reset code.'
                 }
             }
         )
@@ -338,9 +345,9 @@ def password_reset_confirm(request):
             {"detail": "User not found."},
             status=status.HTTP_400_BAD_REQUEST
         )
-
-
 # JWT Token Views (using simplejwt)
+
+
 class CustomTokenVerifyView(TokenVerifyView):
     permission_classes = [permissions.AllowAny]
 

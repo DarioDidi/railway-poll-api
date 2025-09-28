@@ -114,7 +114,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'date_joined', 'created_at', 'updated_at'
         )
         read_only_fields = ('id', 'email', 'created_at',
-                            'updated_at', 'email_verified')
+                            'updated_at')
 
     def get_full_name(self, obj):
         return obj.get_full_name()
@@ -161,7 +161,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context['request'].user
         user.set_password(self.validated_data['new_password'])
         user.save()
-        logout(self.context['request'])
         return user
 
 
