@@ -4,19 +4,8 @@ import re
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.contrib.auth.password_validation import validate_password
 from django.utils.translation import gettext_lazy as _
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, logout
 from rest_framework import serializers
-# from dj_rest_auth.registration.serializers import RegisterSerializer
-
-
-# class CustomRegisterSerializer(RegisterSerializer):
-#    username = None  # Remove username field
-#
-#    def get_cleaned_data(self):
-#        return {
-#            'password1': self.validated_data.get('password1', ''),
-#            'email': self.validated_data.get('email', ''),
-#        }
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -105,12 +94,6 @@ class UserLoginSerializer(serializers.Serializer):
                 code='authorization'
             )
 
-        # if not user.email_verified:
-        #    raise serializers.ValidationError(
-        #        _('Email not verified'),
-        #        code='authorization'
-        #    )
-
         if not user.is_active:
             raise serializers.ValidationError(
                 _('User account is disabled.'),
@@ -178,6 +161,7 @@ class ChangePasswordSerializer(serializers.Serializer):
         user = self.context['request'].user
         user.set_password(self.validated_data['new_password'])
         user.save()
+        logout(self.context['request'])
         return user
 
 
@@ -225,10 +209,6 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
 
 class TokenVerifySerializer(serializers.Serializer):
     token = serializers.CharField(required=True)
-
-
-class EmailVerificationRequestSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
 
 
 class AuthTokenSerializer(serializers.Serializer):

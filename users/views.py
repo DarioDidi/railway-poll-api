@@ -1,28 +1,25 @@
 # users/views.py
-from .utils import (
-    verify_password_reset_token, generate_reset_code, store_reset_code,
-    verify_reset_code, clear_reset_code)
-from .serializers import *
+from .utils import (generate_reset_code, store_reset_code,
+                    verify_reset_code, clear_reset_code)
+from .serializers import (UserRegistrationSerializer, UserLoginSerializer,
+                          UserProfileSerializer, ChangePasswordSerializer,
+                          PasswordResetConfirmSerializer,
+                          PasswordResetRequestSerializer)
 from .models import User
-from django.utils import timezone
 from django.contrib.auth import login, logout
 from rest_framework_simplejwt.views import TokenVerifyView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status, generics, permissions
-from django.http import JsonResponse
-from django.views import View
-# from allauth.account.models import (EmailConfirmation,
-#                                    get_emailconfirmation_model)
-# from allauth.account.internal.flows.email_verification\
-#    import verify_email
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from .schema import *
+from .schema import (password_change_request_body, password_reset_confirm_body,
+                     password_reset_request_body, registration_request_body,
+                     error_response, login_request_body, auth_token_response,
+                     user_profile_response, token_verify_body,
+                     token_refresh_body)
 
 import logging
 
@@ -166,8 +163,10 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'first_name': openapi.Schema(type=openapi.TYPE_STRING, maxLength=50),
-                'last_name': openapi.Schema(type=openapi.TYPE_STRING, maxLength=50),
+                'first_name': openapi.Schema(type=openapi.TYPE_STRING,
+                                             maxLength=50),
+                'last_name': openapi.Schema(type=openapi.TYPE_STRING,
+                                            maxLength=50),
             }
         ),
         responses={
@@ -213,7 +212,8 @@ class ChangePasswordView(generics.UpdateAPIView):
 
     @swagger_auto_schema(
         operation_summary="Change password",
-        operation_description="Change authenticated user's password. Requires current password for verification.",
+        operation_description=("Change authenticated user's password."
+                               " Requires current password for verification."),
         request_body=password_change_request_body,
         responses={
             status.HTTP_200_OK: openapi.Response(
@@ -245,7 +245,8 @@ class ChangePasswordView(generics.UpdateAPIView):
     method='post',
     operation_summary="Request password reset",
     operation_description=("Request password reset email."
-                           " Always returns success to prevent email enumeration."),
+                           " Always returns success to"
+                           " prevent email enumeration."),
     request_body=password_reset_request_body,
     responses={
         status.HTTP_200_OK: openapi.Response(
@@ -259,6 +260,8 @@ class ChangePasswordView(generics.UpdateAPIView):
         )
     },
     tags=['password']
+
+
 )
 @api_view(['POST'])
 @permission_classes([permissions.AllowAny])
@@ -274,7 +277,8 @@ def password_reset_request(request):
         "reset_code": reset_code,
         "email": email,
         "expires_in": 900,  # 15 minutes in seconds
-        "detail": "Use this code to reset your password. Code expires in 15 minutes."
+        "detail": ("Use this code to reset your password."
+                   " Code expires in 15 minutes.")
     })
 
 
@@ -334,122 +338,6 @@ def password_reset_confirm(request):
             {"detail": "User not found."},
             status=status.HTTP_400_BAD_REQUEST
         )
-
-# @swagger_auto_schema(
-#    method='get',
-#    operation_summary="Verify email address",
-#    operation_description=("Verify email address using token from"
-#                           " verification email"
-#                           " (GET endpoint for email links)."),
-#    manual_parameters=[token_parameter],
-#    responses={
-#        status.HTTP_200_OK: openapi.Response(
-#            description="Email verified successfully",
-#            examples={
-#                'application/json': {
-#                    'detail': 'Email verified successfully.'
-#                }
-#            }
-#        ),
-#        status.HTTP_400_BAD_REQUEST: openapi.Response(
-#            description="Invalid or expired token",
-#            examples={
-#                'application/json': {
-#                    'detail': 'Invalid or expired verification token.'
-#                }
-#            }
-#        )
-#    },
-#    tags=['verification']
-# )
-# @api_view(['GET'])
-# @permission_classes([permissions.AllowAny])
-# def verify_email(request, token):
-#    """GET endpoint for email verification (clicking link in email)"""
-#    user = verify_email_token(token)
-#
-#    if not user:
-#        return Response(
-#            {"detail": "Invalid or expired verification token."},
-#            status=status.HTTP_400_BAD_REQUEST
-#        )
-#
-#    user.email_verified = True
-#    user.save()
-#
-#    # Mark token as used
-#    from .models import EmailVerificationToken
-#    EmailVerificationToken.objects.filter(token=token).update(used=True)
-#
-#    return Response({"detail": "Email verified successfully."})
-
-
-# @swagger_auto_schema(
-#    method='post',
-#    operation_summary="Request email verification",
-#    operation_description=("Request new email verification email"
-#                           " to be sent. Rate limited to prevent spam."),
-#    request_body=email_verification_request_body,
-#    responses={
-#        status.HTTP_200_OK: openapi.Response(
-#            description="Verification email sent",
-#            examples={
-#                'application/json': {
-#                    'detail': 'Verification email sent.'
-#                }
-#            }
-#        ),
-#        status.HTTP_400_BAD_REQUEST: openapi.Response(
-#            description="Email already verified or not found",
-#            examples={
-#                'application/json': {
-#                    'detail': 'Email is already verified.'
-#                }
-#            }
-#        ),
-#        status.HTTP_429_TOO_MANY_REQUESTS: openapi.Response(
-#            description="Too many requests",
-#            examples={
-#                'application/json': {
-#                    'detail': 'Please wait before requesting another verification email.'
-#                }
-#            }
-#        )
-#    },
-#    tags=['verification']
-# )
-# @api_view(['POST'])
-# @permission_classes([permissions.AllowAny])
-# def verify_email_request(request):
-#    """Request a new verification email"""
-#    serializer = EmailVerificationRequestSerializer(data=request.data)
-#    serializer.is_valid(raise_exception=True)
-#
-#    email = serializer.validated_data['email']
-#    try:
-#        user = User.objects.get(email__iexact=email)
-#        if user.email_verified:
-#            return Response(
-#                {"detail": "Email is already verified."},
-#                status=status.HTTP_400_BAD_REQUEST
-#            )
-#
-#        # Prevent email spam
-#        if (user.last_email_sent and
-#                (timezone.now() - user.last_email_sent).seconds < 300):  # 5 minutes
-#            return Response(
-#                {"detail": "Please wait before requesting another verification email."},
-#                status=status.HTTP_429_TOO_MANY_REQUESTS
-#            )
-#
-#        send_verification_email(user, request)
-#        return Response({"detail": "Verification email sent."})
-#
-#    except User.DoesNotExist:
-#        return Response(
-#            {"detail": "User with this email does not exist."},
-#            status=status.HTTP_404_NOT_FOUND
-#        )
 
 
 # JWT Token Views (using simplejwt)

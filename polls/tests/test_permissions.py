@@ -80,7 +80,7 @@ class TestPollPermissions:
         request.user = user
         assert permission.has_object_permission(request, None, poll) is True
 
-        # Owner should not be able to delete poll with votes
+        # Owner should not be able to delete poll with votes(tentatively)
         # try:
         #    permission.has_object_permission(request, None, poll_with_votes)
         #    assert False, "Should have raised PermissionDenied"

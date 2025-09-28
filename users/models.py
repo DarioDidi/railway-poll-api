@@ -58,10 +58,8 @@ class User(AbstractUser):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
-    # email_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # last_email_sent = models.DateTimeField(null=True, blank=True)
 
     username = models.CharField(max_length=150, blank=True, null=True)
 
@@ -96,17 +94,6 @@ class User(AbstractUser):
                 self.email)
         super().save(*args, **kwargs)
 
-
-# class EmailVerificationToken(models.Model):
-#    """Model to track email verification tokens"""
-#    user = models.ForeignKey(User, on_delete=models.CASCADE)
-#    token = models.CharField(max_length=255, unique=True)
-#    created_at = models.DateTimeField(auto_now_add=True)
-#    used = models.BooleanField(default=False)
-#
-#    def is_expired(self):
-#        return timezone.now() > self.created_at + timezone.timedelta(hours=24)
-#
 
 class PasswordResetToken(models.Model):
     """Model to track password reset tokens"""

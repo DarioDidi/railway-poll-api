@@ -28,6 +28,12 @@ REST_FRAMEWORK = {
         'suspicious': '5/minute',
         # 'suspicious': '5/m',
     },
-
-
 }
+
+SECURE_PROXY_SSL_HEADER = ()
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [
+    '*'
+]

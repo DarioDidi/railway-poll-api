@@ -1,11 +1,8 @@
 # tests/conftest.py
 import pytest
-# from django.conf import settings
 from rest_framework.test import APIClient
 from model_bakery import baker
-from users.models import User  # , EmailVerificationToken, PasswordResetToken
-# import jwt
-# from datetime import datetime, timedelta
+from users.models import User
 
 
 @pytest.fixture
@@ -38,7 +35,6 @@ def authenticated_user(api_client, create_user):
         first_name='Auth',
         last_name='User',
         password='testpass123',
-        #        email_verified=True,
         is_active=True
     )
     user.set_password('testpass123')
@@ -54,12 +50,9 @@ def authenticated_client(client, authenticated_user):
     """Authenticated API client"""
     """Create an authenticated client"""
     client = APIClient()
-    # Try both authentication methods:
-
-    # Method 1: Using force_authenticate (recommended for tests)
     client.force_authenticate(user=authenticated_user)
 
-    # OR Method 2: Using login (if you need session auth)
+    # OR
     # login_success = client.login(email=user.email, password='testpass123')
     # print(f"Login success: {login_success}")
 
@@ -73,7 +66,6 @@ def unverified_user(create_user):
         first_name='Unverified',
         last_name='User',
         password='testpass123',
-        # email_verified=False,
         is_active=True
     )
     user.set_password('testpass123')
@@ -88,7 +80,6 @@ def inactive_user(create_user):
         first_name='Inactive',
         last_name='User',
         password='testpass123',
-        # email_verified=True,
         is_active=False
     )
     user.set_password('testpass123')

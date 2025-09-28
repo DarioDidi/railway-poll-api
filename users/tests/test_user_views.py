@@ -2,8 +2,7 @@
 import pytest
 from django.urls import reverse
 from rest_framework import status
-# from model_bakery import baker
-from users.models import User  # , EmailVerificationToken, PasswordResetToken
+from users.models import User
 
 
 @pytest.mark.django_db

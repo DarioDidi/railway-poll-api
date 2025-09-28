@@ -12,12 +12,6 @@ email_parameter = openapi.Parameter(
     format=openapi.FORMAT_EMAIL
 )
 
-# token_parameter = openapi.Parameter(
-#    'token',
-#    openapi.IN_PATH,
-#    description="Verification token from email",
-#    type=openapi.TYPE_STRING
-# )
 
 # Common response schemas
 user_profile_response = openapi.Response(
@@ -119,14 +113,6 @@ password_reset_confirm_body = openapi.Schema(
     }
 )
 
-# email_verification_request_body = openapi.Schema(
-#    type=openapi.TYPE_OBJECT,
-#    required=['email'],
-#    properties={
-#        'email': openapi.Schema(type=openapi.TYPE_STRING,
-#                                format=openapi.FORMAT_EMAIL),
-#    }
-# )
 
 token_verify_body = openapi.Schema(
     type=openapi.TYPE_OBJECT,

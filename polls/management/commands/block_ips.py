@@ -10,7 +10,6 @@ class Command(BaseCommand):
                             help='IP to block')
 
     def handle(self, *args, **kwargs):
-        # ip_addr = args[0]
         ip_address = kwargs['ip_address']
 
         # Check if already blocked

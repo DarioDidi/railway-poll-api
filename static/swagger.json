@@ -16,13 +16,16 @@
         "application/json"
     ],
     "securityDefinitions": {
-        "Basic": {
-            "type": "basic"
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "JWT or Token authorization. Example: \"Bearer {token}\""
         }
     },
     "security": [
         {
-            "Basic": []
+            "Bearer": []
         }
     ],
     "paths": {
@@ -796,7 +799,7 @@
         "/my-votes/by_poll/": {
             "get": {
                 "operationId": "my-votes_by_poll",
-                "description": "Get all votes by the current user for a specific poll.",
+                "description": "Retrieve user's vote on a poll",
                 "parameters": [
                     {
                         "name": "search",
@@ -818,6 +821,12 @@
                         "description": "A page number within the paginated result set.",
                         "required": false,
                         "type": "integer"
+                    },
+                    {
+                        "name": "poll_id",
+                        "in": "query",
+                        "description": "Filter vote by poll",
+                        "type": "string"
                     }
                 ],
                 "responses": {
@@ -1167,7 +1176,7 @@
             },
             "put": {
                 "operationId": "polls_update",
-                "description": "ViewSet for managing polls with comprehensive permission controls.",
+                "description": "Update a poll that is yet to start",
                 "parameters": [
                     {
                         "name": "data",
@@ -1184,6 +1193,9 @@
                         "schema": {
                             "$ref": "#/definitions/Poll"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     }
                 },
                 "tags": [
@@ -1192,7 +1204,7 @@
             },
             "patch": {
                 "operationId": "polls_partial_update",
-                "description": "ViewSet for managing polls with comprehensive permission controls.",
+                "description": "Update a poll that is yet to start",
                 "parameters": [
                     {
                         "name": "data",
@@ -1209,6 +1221,9 @@
                         "schema": {
                             "$ref": "#/definitions/Poll"
                         }
+                    },
+                    "400": {
+                        "description": "Bad Request"
                     }
                 },
                 "tags": [

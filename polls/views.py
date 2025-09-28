@@ -75,6 +75,29 @@ class PollViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
 
+    @swagger_auto_schema(
+        operation_description="Update a poll that is yet to start",
+        request_body=PollSerializer,
+        responses={
+            200: PollSerializer,
+            400: "Bad Request"
+        }
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @swagger_auto_schema(
+        operation_description="Update a poll that is yet to start",
+        request_body=PollSerializer,
+        responses={
+            200: PollSerializer,
+            400: "Bad Request"
+        }
+    )
+    def partial_update(self, request, *args, **kwargs):
+        '''Partial update of a poll'''
+        return super().partial_update(request, *args, **kwargs)
+
     def get_serializer_class(self):
         if self.action == 'create':
             return PollCreateSerializer
@@ -94,6 +117,8 @@ class PollViewSet(viewsets.ModelViewSet):
             permission_classes = [IsAuthenticated, CanDeletePoll]
         elif self.action == 'vote':
             permission_classes = [IsAuthenticated, CanVote]
+        elif self.action == 'my_polls':
+            permission_classes = [IsAuthenticated, ]
         else:
             # list, retrieve, results - read operations
             # permission_classes = [IsOwnerOrReadOnly]
@@ -300,6 +325,17 @@ class VoteViewSet(mixins.ListModelMixin,
             return Vote.objects.filter(user=self.request.user)
         return Vote.objects.none()
 
+    @swagger_auto_schema(
+        operation_description=("Retrieve user's vote on a poll"),
+        manual_parameters=[
+            openapi.Parameter(
+                'poll_id',
+                openapi.IN_QUERY,
+                description="Filter vote by poll",
+                type=openapi.TYPE_STRING
+            ),
+        ]
+    )
     @action(detail=False, methods=['get'])
     def by_poll(self, request):
         """

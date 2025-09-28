@@ -31,7 +31,6 @@ def unverified_user():
     user = User.objects.create_user(
         email='unverified@example.com',
         password='testpass123',
-        # email_verified=False
     )
     return user
 
@@ -41,12 +40,10 @@ def authenticated_client(client, verified_user):
     """Authenticated API client"""
     """Create an authenticated client"""
     client = APIClient()
-    # Try both authentication methods:
 
-    # Method 1: Using force_authenticate (recommended for tests)
     client.force_authenticate(user=verified_user)
 
-    # OR Method 2: Using login (if you need session auth)
+    # OR
     # login_success = client.login(email=user.email, password='testpass123')
     # print(f"Login success: {login_success}")
 

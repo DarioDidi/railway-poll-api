@@ -20,8 +20,8 @@ def user():
     return User.objects.create_user(
         email='test@example.com',
         password='testpass123',
-        # first_name='Test',
-        # last_name='User'
+        first_name='Test',
+        last_name='User'
     )
 
 
@@ -31,8 +31,8 @@ def user2():
     return User.objects.create_user(
         email='test2@example.com',
         password='testpass123',
-        # first_name='Test2',
-        # last_name='User2'
+        first_name='Test2',
+        last_name='User2'
     )
 
 

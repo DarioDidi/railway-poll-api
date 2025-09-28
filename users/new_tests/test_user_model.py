@@ -27,7 +27,6 @@ class TestUserModel:
         superuser = User.objects.create_superuser(
             email='admin@example.com',
             password='adminpass123',
-            # username='super1'
         )
 
         assert superuser.email == 'admin@example.com'

@@ -83,7 +83,7 @@ class CanDeletePoll(permissions.BasePermission):
         if obj.owner != request.user:
             return False
 
-        # Check if poll has votes
+        # Check if poll has votes(Tentative)
         # if obj.votes.exists():
         #    raise PermissionDenied(
         #        detail="Cannot delete a poll that has votes.",

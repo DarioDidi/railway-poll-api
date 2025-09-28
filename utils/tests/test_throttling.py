@@ -63,7 +63,8 @@ class TestSuspiciousRequestThrottle:
         response.status_code = 429
 
         # Mock the parent method to avoid actual cache operations
-        with patch.object(throttle, 'wait') as mock_wait:
+        # with patch.object(throttle, 'wait') as mock_wait:
+        with patch.object(throttle, 'wait') as _:
             throttle.throttle_failure(request, response)
 
         # Should attempt to create a blocked IP entry
@@ -88,7 +89,7 @@ class TestSuspiciousRequestThrottle:
         response = Mock()
         response.status_code = 429
 
-        with patch.object(throttle, 'wait') as mock_wait:
+        with patch.object(throttle, 'wait') as _:
             throttle.throttle_failure(request, response)
 
         # Should not create duplicate block

@@ -6,10 +6,7 @@ from users.serializers import (
     UserLoginSerializer,
     UserProfileSerializer,
     ChangePasswordSerializer,
-    #   PasswordResetRequestSerializer,
-    #   PasswordResetConfirmSerializer
 )
-# from model_bakery import baker
 
 User = get_user_model()
 
@@ -115,25 +112,6 @@ class TestUserLoginSerializer:
 
         assert not serializer.is_valid()
         assert 'non_field_errors' in serializer.errors
-
-    # def test_unverified_email(self, create_user, rf):
-    #    user = create_user(
-    #        email='test@example.com',
-    #        password='testpass123',
-    #        # email_verified=False,
-    #        is_active=True
-    #    )
-    #    user.set_password('testpass123')
-    #    user.save()
-
-    #    request = rf.post('/login/')
-    #    serializer = UserLoginSerializer(
-    #        data={'email': 'test@example.com', 'password': 'testpass123'},
-    #        context={'request': request}
-    #    )
-
-    #    assert not serializer.is_valid()
-    #    assert 'non_field_errors' in serializer.errors
 
     def test_inactive_user(self, create_user, rf):
         user = create_user(

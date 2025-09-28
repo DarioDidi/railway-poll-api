@@ -30,6 +30,8 @@ class Poll(models.Model):
     is_anonymous = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    first_name = models.CharField(blank=True, null=True, max_length=100)
+    last_name = models.CharField(blank=True, null=True, max_length=100)
 
     # Always has an owner (for accountability and management)
     owner = models.ForeignKey(
@@ -48,7 +50,6 @@ class Poll(models.Model):
     )
 
     start_date = models.DateTimeField(
-        # auto_now_add=True,
         default=current_time,
         validators=[MinValueValidator(current_time)]
     )

@@ -1,6 +1,6 @@
 # Railway deployment settings
 import os
-import dj_database_url
+# import dj_database_url
 
 from pathlib import Path
 from django.utils.timezone import timedelta
@@ -19,15 +19,8 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 
 DEBUG = False
 
-# ALLOWED_HOSTS = ['.localhost',
-#                 '.onrender.com']
+ALLOWED_HOSTS = ['.localhost']
 
-ALLOWED_HOSTS = ['*']
-
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
 
 AUTH_USER_MODEL = "users.User"
 
@@ -177,7 +170,6 @@ REST_FRAMEWORK = {
         'anon': '100/day',
         'user': '1000/day',
         'suspicious': '5/minute',
-        # 'suspicious': '5/m',
     },
     'DEFAULT_PAGINATION_CLASS': ('rest_framework.'
                                  'pagination.PageNumberPagination'),
@@ -226,6 +218,16 @@ SIMPLE_JWT = {
 
 # swagger
 SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': (
+                'JWT or Token authorization. Example: "Bearer {token}"')
+        }
+    },
+    'USE_SESSION_AUTH': False,
     "DEFAULT_INFO": 'poll_site.urls.api_info'
 }
 SWAGGER_USE_COMPAT_RENDERERS = False
@@ -286,8 +288,9 @@ DATABASES = {
 #        ssl_require=True
 #    )
 # }
-# Redis for Channels
 
+
+# Redis for Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",

@@ -32,8 +32,6 @@ class TestAuthenticationRequirements:
         create_data = {
             'question': 'New Poll',
             'options': ['Yes', 'No'],
-            # 'start_date': current_time(),
-            # 'expiry_date': one_hour_from_now()
         }
 
         response = client.post(reverse('poll-list'),
